@@ -19,6 +19,7 @@ import (
 	"pantheon-spins/server/internal/config"
 	"pantheon-spins/server/internal/dbmigrate"
 	"pantheon-spins/server/internal/games"
+	"pantheon-spins/server/internal/games/catalog"
 	"pantheon-spins/server/internal/httpapi"
 	"pantheon-spins/server/internal/play"
 	"pantheon-spins/server/internal/ratelimit"
@@ -63,7 +64,9 @@ func run() error {
 	}
 
 	registry := games.NewRegistry()
-	// Games are registered here as they are built (step 2 onwards).
+	if err := catalog.Register(registry, cfg.GameConfigDir); err != nil {
+		return err
+	}
 
 	var mailer auth.Mailer = auth.LogMailer{Log: log}
 	if cfg.Mailer == "smtp" {
