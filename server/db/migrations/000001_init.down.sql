@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS wallet_transactions;
+ALTER TABLE IF EXISTS spins DROP CONSTRAINT IF EXISTS spins_bonus_fk;
+DROP TABLE IF EXISTS bonus_sessions;
+DROP TABLE IF EXISTS spins;
+DROP TABLE IF EXISTS wallets;
+DROP TABLE IF EXISTS users;

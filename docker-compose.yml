@@ -1,0 +1,95 @@
+name: pantheon-spins
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: pantheon
+      POSTGRES_PASSWORD: pantheon
+      POSTGRES_DB: pantheon
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pantheon -d pantheon"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      DATABASE_URL: postgres://pantheon:pantheon@postgres:5432/pantheon?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5173}
+      CSRF_SECRET: ${CSRF_SECRET:-dev-only-csrf-secret-change-me-0123456789abcdef}
+      # Local dev runs over plain http. Set to true behind HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL:-}
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_PROXY: http://server:8080
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    depends_on:
+      - server
+
+  # Go toolchain for codegen and tests without a local Go install, e.g.
+  #   docker compose run --rm gotools go test ./...
+  #   docker compose run --rm gotools go generate ./...
+  gotools:
+    profiles: [tools]
+    image: golang:1.26
+    working_dir: /src/server
+    environment:
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+    volumes:
+      - .:/src
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gomod:/go/pkg/mod
+      - gocache:/root/.cache/go-build
+
+  # sqlc code generation: docker compose run --rm sqlc
+  sqlc:
+    profiles: [tools]
+    image: sqlc/sqlc:1.29.0
+    working_dir: /src
+    command: generate
+    volumes:
+      - ./server:/src
+
+volumes:
+  pgdata:
+  web_node_modules:
+  gomod:
+  gocache:

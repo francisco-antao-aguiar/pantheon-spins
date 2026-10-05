@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-night-950: #0b0a12;
+  --color-night-900: #14111f;
+  --color-night-800: #1d1930;
+  --color-night-700: #2a2443;
+  --color-night-600: #3b335c;
+  --color-gold-300: #ffe08a;
+  --color-gold-400: #f5c451;
+  --color-gold-500: #e0a52f;
+  --color-gold-600: #c8891d;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100dvh;
+  }
+  body {
+    @apply bg-night-950 font-sans text-slate-100 antialiased;
+    background-image:
+      radial-gradient(ellipse at 50% -10%, rgb(245 196 81 / 0.12), transparent 60%),
+      radial-gradient(ellipse at 100% 100%, rgb(91 61 170 / 0.18), transparent 50%);
+    background-attachment: fixed;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-gold-400;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
