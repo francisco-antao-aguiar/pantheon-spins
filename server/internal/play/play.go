@@ -217,6 +217,7 @@ func (s *Service) BonusAction(ctx context.Context, userID uuid.UUID, gameID stri
 		res = api.BonusStepResult{
 			State:   sess.API(),
 			StepWin: out.Win,
+			WinTier: games.WinTierFor(sess.Bet, out.Win),
 			Balance: l.Balance(),
 			Reveal:  out.Reveal,
 		}

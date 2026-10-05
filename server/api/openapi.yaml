@@ -771,10 +771,11 @@ components:
 
     BonusStepResult:
       type: object
-      required: [state, stepWin, balance]
+      required: [state, stepWin, winTier, balance]
       properties:
         state: { $ref: "#/components/schemas/BonusState" }
         stepWin: { $ref: "#/components/schemas/Coins" }
+        winTier: { $ref: "#/components/schemas/WinTier" }
         balance: { $ref: "#/components/schemas/Coins" }
         outcome:
           $ref: "#/components/schemas/SpinOutcome"

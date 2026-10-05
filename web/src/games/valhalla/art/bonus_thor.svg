@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e1d1d"/><stop offset="1" stop-color="#280808"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#e3b23c"/><stop offset="1" stop-color="#5a3d0c"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#ffd36b" stop-opacity=".35"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f6fa"/><stop offset=".5" stop-color="#9aa8b8"/><stop offset="1" stop-color="#4b5666"/></linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="34" fill="url(#rim)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#glow)"/>
+  
+  <path d="M138 30 L104 104 L132 104 L112 150" fill="none" stroke="#fff27a" stroke-width="8" stroke-linejoin="round" filter="url(#soft)"/>
+  <path d="M138 30 L104 104 L132 104 L112 150" fill="none" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="116" y="110" width="24" height="86" rx="6" fill="#7a4a22" stroke="#3f230c" stroke-width="4"/>
+  <rect x="62" y="70" width="132" height="58" rx="10" fill="url(#steel)" stroke="#39414c" stroke-width="5"/>
+  <path d="M74 86 H182 M74 112 H182" stroke="#6c7684" stroke-width="4"/>
+  <circle cx="128" cy="99" r="12" fill="url(#gold)"/>
+  <text x="128" y="226" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="26" fill="#fff6dc" stroke="#2a1600" stroke-width="5" paint-order="stroke" letter-spacing="2">THOR</text>
+</svg>
+<!-- bonus_thor -->

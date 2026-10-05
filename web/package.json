@@ -9,17 +9,24 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "gen:api": "openapi-typescript ../server/api/openapi.yaml -o src/api/schema.d.ts"
+    "gen:api": "openapi-typescript ../server/api/openapi.yaml -o src/api/schema.d.ts",
+    "e2e": "playwright test",
+    "gen:art": "node scripts/gen-valhalla-art.mjs",
+    "gen:audio": "node scripts/gen-audio.mjs"
   },
   "dependencies": {
+    "howler": "2.2.4",
     "openapi-fetch": "0.17.0",
+    "pixi.js": "8.22.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router": "7.18.4",
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "4.3.3",
+    "@types/howler": "2.2.13",
     "@types/node": "24.19.1",
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",

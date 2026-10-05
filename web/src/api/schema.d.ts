@@ -468,6 +468,13 @@ export interface components {
             positions: components["schemas"]["Position"][];
             /** @description Reels on which to play the slow-down near-trigger animation */
             anticipation?: number[];
+            /**
+             * @description What the trigger decided, for the reveal animation (e.g. which god
+             *     the bonus symbols chose and how many free spins were awarded).
+             */
+            data?: {
+                [key: string]: unknown;
+            };
         };
         /** @description The animated part of a spin; reused by free-spin bonus steps. */
         SpinOutcome: {
@@ -537,6 +544,7 @@ export interface components {
         BonusStepResult: {
             state: components["schemas"]["BonusState"];
             stepWin: components["schemas"]["Coins"];
+            winTier: components["schemas"]["WinTier"];
             balance: components["schemas"]["Coins"];
             outcome?: components["schemas"]["SpinOutcome"];
             /** @description What this action revealed (pick contents, wheel segment, …) */
