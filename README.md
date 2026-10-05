@@ -15,7 +15,8 @@ Coins cannot be bought with real money and cannot be withdrawn.
 docker compose up --build
 ```
 
-Open http://localhost:5173. The web container proxies `/api` to the server, so
+Open http://localhost:5173. Emails the app sends (password resets) land in the
+local Mailpit inbox at http://localhost:8025. The web container proxies `/api` to the server, so
 cookies and CSRF behave exactly as in production. Migrations run when the
 server starts.
 

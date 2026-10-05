@@ -65,8 +65,13 @@ func run() error {
 	registry := games.NewRegistry()
 	// Games are registered here as they are built (step 2 onwards).
 
+	var mailer auth.Mailer = auth.LogMailer{Log: log}
+	if cfg.Mailer == "smtp" {
+		mailer = auth.SMTPMailer{Addr: cfg.SMTPAddr, From: cfg.SMTPFrom, Username: cfg.SMTPUsername, Password: cfg.SMTPPassword}
+	}
+
 	sessions := auth.NewSessions(rdb, cfg.SessionTTL)
-	authSvc, err := auth.NewService(pool, sessions, auth.LogMailer{Log: log}, log, auth.Options{
+	authSvc, err := auth.NewService(pool, sessions, mailer, log, auth.Options{
 		Argon2:      auth.DefaultArgon2,
 		SignupBonus: cfg.SignupBonus,
 		AppBaseURL:  cfg.AppBaseURL,
@@ -110,7 +115,7 @@ func run() error {
 	}
 	errc := make(chan error, 1)
 	go func() {
-		log.Info("listening", "addr", cfg.HTTPAddr, "games", len(registry.List()), "google_auth", google != nil)
+		log.Info("listening", "addr", cfg.HTTPAddr, "games", len(registry.List()), "google_auth", google != nil, "mailer", cfg.Mailer)
 		errc <- srv.ListenAndServe()
 	}()
 

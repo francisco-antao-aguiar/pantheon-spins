@@ -96,13 +96,13 @@ func (s *Service) Spin(ctx context.Context, userID uuid.UUID, gameID string, bet
 		}
 
 		res = api.SpinResult{
-			SpinId:       spinID,
-			GameId:       gameID,
-			Bet:          bet,
-			Outcome:      out.Outcome,
-			TotalWin:     win,
-			WinTier:      games.WinTierFor(bet, win),
-			Balance:      l.Balance() - bet + win,
+			SpinId:   spinID,
+			GameId:   gameID,
+			Bet:      bet,
+			Outcome:  out.Outcome,
+			TotalWin: win,
+			WinTier:  games.WinTierFor(bet, win),
+			Balance:  l.Balance() - bet + win,
 		}
 		if sess != nil {
 			res.BonusTrigger = *out.Trigger

@@ -37,8 +37,12 @@ type Config struct {
 	GoogleClientSecret string
 	GoogleRedirectURL  string
 
-	// Mailer selects how emails are sent. Only "log" (development) exists today.
-	Mailer string
+	// Mailer selects how emails are sent: "smtp" or "log" (writes them to the log).
+	Mailer       string
+	SMTPAddr     string
+	SMTPFrom     string
+	SMTPUsername string
+	SMTPPassword string
 }
 
 func (c Config) GoogleEnabled() bool {
@@ -58,6 +62,10 @@ func Load() (Config, error) {
 		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 		GoogleRedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
 		Mailer:             env("MAILER", "log"),
+		SMTPAddr:           os.Getenv("SMTP_ADDR"),
+		SMTPFrom:           env("SMTP_FROM", "Pantheon Spins <no-reply@pantheon.local>"),
+		SMTPUsername:       os.Getenv("SMTP_USERNAME"),
+		SMTPPassword:       os.Getenv("SMTP_PASSWORD"),
 		CSRFSecret:         []byte(os.Getenv("CSRF_SECRET")),
 	}
 	if c.DatabaseURL == "" {
@@ -94,8 +102,14 @@ func Load() (Config, error) {
 	if c.SignupBonus, err = strconv.ParseInt(env("SIGNUP_BONUS", "10000"), 10, 64); err != nil || c.SignupBonus < 0 {
 		errs = append(errs, fmt.Errorf("SIGNUP_BONUS must be a non-negative integer"))
 	}
-	if c.Mailer != "log" {
-		errs = append(errs, fmt.Errorf("MAILER %q is not supported (use \"log\")", c.Mailer))
+	switch c.Mailer {
+	case "log":
+	case "smtp":
+		if c.SMTPAddr == "" {
+			errs = append(errs, errors.New("SMTP_ADDR is required when MAILER=smtp"))
+		}
+	default:
+		errs = append(errs, fmt.Errorf("MAILER %q is not supported (use \"smtp\" or \"log\")", c.Mailer))
 	}
 	return c, errors.Join(errs...)
 }

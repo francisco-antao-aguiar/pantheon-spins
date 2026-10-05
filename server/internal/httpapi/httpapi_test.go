@@ -198,6 +198,10 @@ func TestAuthFlow(t *testing.T) {
 		t.Fatal("email sent for an unknown account")
 	}
 	c.do(http.MethodPost, "/auth/password-reset/request", map[string]string{"email": creds["email"]}, http.StatusNoContent, nil)
+	// The email is sent in the background.
+	for deadline := time.Now().Add(5 * time.Second); mailer.Last() == "" && time.Now().Before(deadline); {
+		time.Sleep(10 * time.Millisecond)
+	}
 	m := regexp.MustCompile(`token=([A-Za-z0-9_-]+)`).FindStringSubmatch(mailer.Last())
 	if m == nil {
 		t.Fatalf("no reset link in email: %q", mailer.Last())
