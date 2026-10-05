@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+package: api
+output: internal/api/api.gen.go
+generate:
+  chi-server: true
+  models: true
+  embedded-spec: true
+output-options:
+  skip-prune: true
+  # Optional fields become plain values tagged `omitzero` instead of pointers,
+  # which keeps the game engine code (it builds these types directly) free of
+  # pointer noise. Zero values are omitted from JSON; clients treat a missing
+  # `multiplier` as 1.
+  prefer-skip-optional-pointer: true
+  prefer-skip-optional-pointer-with-omitzero: true

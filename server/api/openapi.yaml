@@ -1,0 +1,798 @@
+openapi: 3.0.3
+info:
+  title: Pantheon Spins API
+  version: 0.1.0
+  description: |
+    Social casino API. All currency is play money ("Coins"): it cannot be bought
+    with real money and cannot be withdrawn.
+
+    Every game outcome is computed on the server. The client sends only a game
+    ID and a bet, then animates the returned result.
+
+    State-changing requests (POST/PATCH/PUT/DELETE) must send the `X-CSRF-Token`
+    header with the value of the `ps_csrf` cookie, which the server sets on every
+    response that lacks one.
+servers:
+  - url: /api/v1
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: system
+  - name: auth
+  - name: profile
+  - name: wallet
+  - name: games
+  - name: history
+
+paths:
+  /health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /auth/csrf:
+    get:
+      tags: [auth]
+      operationId: getCsrfToken
+      security: []
+      description: Returns the CSRF token and sets the `ps_csrf` cookie if needed.
+      responses:
+        "200":
+          description: CSRF token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfToken"
+
+  /auth/register:
+    post:
+      tags: [auth]
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Account created and signed in. Sets the session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/login:
+    post:
+      tags: [auth]
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Signed in. Sets the session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      security: []
+      responses:
+        "204":
+          description: Signed out. Clears the session cookie.
+
+  /auth/password-reset/request:
+    post:
+      tags: [auth]
+      operationId: requestPasswordReset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+      responses:
+        "204":
+          description: |
+            Always returned, whether or not the email exists, so the endpoint
+            cannot be used to discover accounts.
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/password-reset/confirm:
+    post:
+      tags: [auth]
+      operationId: confirmPasswordReset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetConfirm"
+      responses:
+        "204":
+          description: Password changed. All existing sessions are revoked.
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/providers:
+    get:
+      tags: [auth]
+      operationId: getAuthProviders
+      security: []
+      responses:
+        "200":
+          description: Which sign-in methods are enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthProviders"
+
+  /auth/google/start:
+    get:
+      tags: [auth]
+      operationId: googleStart
+      security: []
+      responses:
+        "302":
+          description: Redirect to Google
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /auth/google/callback:
+    get:
+      tags: [auth]
+      operationId: googleCallback
+      security: []
+      parameters:
+        - { name: code, in: query, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
+        - { name: error, in: query, schema: { type: string } }
+      responses:
+        "302":
+          description: Redirect back to the web app
+
+  /me:
+    get:
+      tags: [profile]
+      operationId: getMe
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    patch:
+      tags: [profile]
+      operationId: updateMe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /wallet:
+    get:
+      tags: [wallet]
+      operationId: getWallet
+      responses:
+        "200":
+          description: Wallet balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /wallet/transactions:
+    get:
+      tags: [wallet]
+      operationId: listTransactions
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/BeforeId"
+      responses:
+        "200":
+          description: Newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionPage"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /games:
+    get:
+      tags: [games]
+      operationId: listGames
+      security: []
+      responses:
+        "200":
+          description: All registered games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameInfo"
+
+  /games/{gameId}/spin:
+    post:
+      tags: [games]
+      operationId: spin
+      parameters:
+        - $ref: "#/components/parameters/GameId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpinRequest"
+      responses:
+        "200":
+          description: The full, pre-computed spin result to animate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpinResult"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: |
+            `insufficient_funds`, or `bonus_in_progress` when a bonus on this
+            game must be resolved first.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /games/{gameId}/bonus:
+    get:
+      tags: [games]
+      operationId: getActiveBonus
+      description: Returns the unresolved bonus on this game so the client can resume it.
+      parameters:
+        - $ref: "#/components/parameters/GameId"
+      responses:
+        "200":
+          description: Active bonus
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BonusState"
+        "204":
+          description: No active bonus
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /games/{gameId}/bonus/actions:
+    post:
+      tags: [games]
+      operationId: bonusAction
+      parameters:
+        - $ref: "#/components/parameters/GameId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BonusActionRequest"
+      responses:
+        "200":
+          description: The step outcome and the new bonus state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BonusStepResult"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /spins:
+    get:
+      tags: [history]
+      operationId: listSpins
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - name: before
+          in: query
+          description: Return spins created before this spin ID (cursor)
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpinHistoryPage"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: ps_session
+
+  parameters:
+    GameId:
+      name: gameId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-z0-9-]{1,64}$"
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+    BeforeId:
+      name: before
+      in: query
+      description: Return items with an ID lower than this (cursor)
+      schema: { type: integer, format: int64 }
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Not signed in, or bad credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: Conflicts with current state
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code, e.g. `insufficient_funds`
+        message:
+          type: string
+
+    Health:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
+
+    CsrfToken:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string }
+
+    AuthProviders:
+      type: object
+      required: [password, google]
+      properties:
+        password: { type: boolean }
+        google: { type: boolean }
+
+    RegisterRequest:
+      type: object
+      required: [email, password, username]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 10, maxLength: 128 }
+        username: { $ref: "#/components/schemas/Username" }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, maxLength: 254 }
+        password: { type: string, maxLength: 128 }
+
+    PasswordResetRequest:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, maxLength: 254 }
+
+    PasswordResetConfirm:
+      type: object
+      required: [token, password]
+      properties:
+        token: { type: string, maxLength: 128 }
+        password: { type: string, minLength: 10, maxLength: 128 }
+
+    Username:
+      type: string
+      minLength: 3
+      maxLength: 20
+      pattern: "^[A-Za-z0-9_]+$"
+
+    AvatarId:
+      type: string
+      description: One of the preset avatar IDs
+      enum: [raven, owl, serpent, scarab, wolf, phoenix, kitsune, spider, fox, comet]
+
+    Me:
+      type: object
+      required: [id, email, username, avatar, balance, createdAt, hasPassword]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        username: { $ref: "#/components/schemas/Username" }
+        avatar: { $ref: "#/components/schemas/AvatarId" }
+        balance: { $ref: "#/components/schemas/Coins" }
+        hasPassword: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        username: { $ref: "#/components/schemas/Username" }
+        avatar: { $ref: "#/components/schemas/AvatarId" }
+
+    Coins:
+      type: integer
+      format: int64
+      description: Play-money amount. Always an integer number of Coins.
+
+    Wallet:
+      type: object
+      required: [balance]
+      properties:
+        balance: { $ref: "#/components/schemas/Coins" }
+
+    TransactionKind:
+      type: string
+      enum: [signup_bonus, spin_bet, spin_win, bonus_win, daily_bonus, hourly_bonus, refill]
+
+    Transaction:
+      type: object
+      required: [id, kind, amount, balanceAfter, createdAt]
+      properties:
+        id: { type: integer, format: int64 }
+        kind: { $ref: "#/components/schemas/TransactionKind" }
+        amount:
+          type: integer
+          format: int64
+          description: Signed change in balance
+        balanceAfter: { $ref: "#/components/schemas/Coins" }
+        gameId: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    TransactionPage:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Transaction" }
+        nextBefore:
+          type: integer
+          format: int64
+          description: Pass as `before` to get the next page. Absent on the last page.
+
+    # ---------- Games ----------
+
+    Volatility:
+      type: string
+      enum: [low, medium, high, very_high]
+
+    LayoutKind:
+      type: string
+      description: How the grid is shaped. The renderer picks its layout from this.
+      enum: [ways, lines, cluster, megaways, hex]
+
+    GameInfo:
+      type: object
+      required: [id, name, theme, layout, reels, rows, volatility, betLevels, defaultBet, tags]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        theme: { type: string }
+        description: { type: string }
+        layout: { $ref: "#/components/schemas/LayoutKind" }
+        reels: { type: integer }
+        rows:
+          type: integer
+          description: Row count, or the maximum row count for variable-height layouts
+        volatility: { $ref: "#/components/schemas/Volatility" }
+        betLevels:
+          type: array
+          items: { $ref: "#/components/schemas/Coins" }
+        defaultBet: { $ref: "#/components/schemas/Coins" }
+        tags:
+          type: array
+          items:
+            type: string
+            enum: [new, hot]
+
+    SpinRequest:
+      type: object
+      required: [bet]
+      properties:
+        bet:
+          $ref: "#/components/schemas/Coins"
+
+    Position:
+      type: object
+      required: [reel, row]
+      properties:
+        reel: { type: integer }
+        row: { type: integer }
+
+    Grid:
+      type: array
+      description: |
+        Symbol IDs by reel (column), each from top to bottom. Reels may differ in
+        length (Megaways). Hex grids use offset columns: `reel` is the column and
+        `row` the cell within it.
+      items:
+        type: array
+        items: { type: string }
+
+    Win:
+      type: object
+      required: [symbol, positions, amount]
+      properties:
+        symbol: { type: string }
+        positions:
+          type: array
+          items: { $ref: "#/components/schemas/Position" }
+        amount: { $ref: "#/components/schemas/Coins" }
+        multiplier:
+          type: integer
+          description: Total multiplier applied to this win (1 when none)
+        ways: { type: integer, description: Ways-pay games only }
+        line: { type: integer, description: Line-pay games only }
+        count:
+          type: integer
+          description: Symbols matched (reels for ways/lines, cluster size for clusters)
+
+    GameEvent:
+      type: object
+      description: |
+        A visual event the client animates in order, e.g. `wild_added`,
+        `multiplier`, `symbol_transform`, `serpent_move`, `lava_spread`.
+        `positions` is what the event affects; `data` holds event-specific
+        values whose shape each game documents.
+      required: [type]
+      properties:
+        type: { type: string }
+        positions:
+          type: array
+          items: { $ref: "#/components/schemas/Position" }
+        symbol: { type: string }
+        value: { type: integer, format: int64 }
+        data:
+          type: object
+          additionalProperties: true
+
+    SpinStep:
+      type: object
+      description: |
+        One grid state. A spin without cascades has one step. For cascades,
+        each step's `removed` positions are cleared and `grid` of the next step
+        is the board after symbols drop in.
+      required: [grid, wins, stepWin]
+      properties:
+        grid: { $ref: "#/components/schemas/Grid" }
+        events:
+          type: array
+          description: Events to play before evaluating this step's wins
+          items: { $ref: "#/components/schemas/GameEvent" }
+        wins:
+          type: array
+          items: { $ref: "#/components/schemas/Win" }
+        removed:
+          type: array
+          items: { $ref: "#/components/schemas/Position" }
+        multiplier:
+          type: integer
+          description: Step multiplier (cascade multipliers etc.), 1 when none
+        stepWin: { $ref: "#/components/schemas/Coins" }
+
+    BonusTrigger:
+      type: object
+      required: [kind, positions]
+      properties:
+        kind: { $ref: "#/components/schemas/BonusKind" }
+        positions:
+          type: array
+          description: The symbols that triggered the bonus
+          items: { $ref: "#/components/schemas/Position" }
+        anticipation:
+          type: array
+          description: Reels on which to play the slow-down near-trigger animation
+          items: { type: integer }
+
+    SpinOutcome:
+      type: object
+      description: The animated part of a spin; reused by free-spin bonus steps.
+      required: [steps, totalWin]
+      properties:
+        steps:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/SpinStep" }
+        events:
+          type: array
+          description: Events after all steps (e.g. end-of-spin multipliers)
+          items: { $ref: "#/components/schemas/GameEvent" }
+        totalWin: { $ref: "#/components/schemas/Coins" }
+        anticipation:
+          type: array
+          description: Reels to spin slower because a feature may land
+          items: { type: integer }
+
+    WinTier:
+      type: string
+      description: Celebration level, chosen by the server from win / bet
+      enum: [none, normal, big, mega, epic]
+
+    SpinResult:
+      type: object
+      required: [spinId, gameId, bet, outcome, totalWin, winTier, balance]
+      properties:
+        spinId: { type: string, format: uuid }
+        gameId: { type: string }
+        bet: { $ref: "#/components/schemas/Coins" }
+        outcome: { $ref: "#/components/schemas/SpinOutcome" }
+        totalWin: { $ref: "#/components/schemas/Coins" }
+        winTier: { $ref: "#/components/schemas/WinTier" }
+        balance:
+          $ref: "#/components/schemas/Coins"
+        bonusTrigger: { $ref: "#/components/schemas/BonusTrigger" }
+        bonus:
+          $ref: "#/components/schemas/BonusState"
+
+    BonusKind:
+      type: string
+      enum: [free_spins, pick, ladder, wheel, plinko, trail, hold_and_win, timing, route]
+
+    BonusStatus:
+      type: string
+      enum: [active, completed]
+
+    BonusState:
+      type: object
+      description: |
+        The public part of a bonus state machine. Hidden values (e.g. what an
+        unpicked tile contains) never leave the server.
+      required: [bonusId, gameId, kind, status, bet, totalWin, actions, data, step]
+      properties:
+        bonusId: { type: string, format: uuid }
+        gameId: { type: string }
+        kind: { $ref: "#/components/schemas/BonusKind" }
+        status: { $ref: "#/components/schemas/BonusStatus" }
+        bet: { $ref: "#/components/schemas/Coins" }
+        totalWin:
+          $ref: "#/components/schemas/Coins"
+        step:
+          type: integer
+          description: Number of actions taken so far
+        actions:
+          type: array
+          description: Actions the player may send next, e.g. `spin`, `pick`, `choose`
+          items: { $ref: "#/components/schemas/BonusActionOption" }
+        data:
+          type: object
+          description: Game-specific public state (spins left, picked tiles, ladder rung…)
+          additionalProperties: true
+
+    BonusActionOption:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string }
+        choices:
+          type: array
+          description: Valid values for `choice`, when the action takes one
+          items: { type: string }
+
+    BonusActionRequest:
+      type: object
+      required: [action, step]
+      properties:
+        action: { type: string, maxLength: 32 }
+        choice: { type: string, maxLength: 64 }
+        step:
+          type: integer
+          description: |
+            The `step` of the state the client acted on. A mismatch returns 409,
+            which makes double-clicks and retries safe.
+
+    BonusStepResult:
+      type: object
+      required: [state, stepWin, balance]
+      properties:
+        state: { $ref: "#/components/schemas/BonusState" }
+        stepWin: { $ref: "#/components/schemas/Coins" }
+        balance: { $ref: "#/components/schemas/Coins" }
+        outcome:
+          $ref: "#/components/schemas/SpinOutcome"
+        reveal:
+          type: object
+          description: What this action revealed (pick contents, wheel segment, …)
+          additionalProperties: true
+
+    SpinHistoryItem:
+      type: object
+      required: [spinId, gameId, bet, win, createdAt]
+      properties:
+        spinId: { type: string, format: uuid }
+        gameId: { type: string }
+        bet: { $ref: "#/components/schemas/Coins" }
+        win: { $ref: "#/components/schemas/Coins" }
+        bonusTriggered: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    SpinHistoryPage:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SpinHistoryItem" }
+        nextBefore: { type: string, format: uuid }
