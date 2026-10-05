@@ -1,0 +1,33 @@
+{
+  "id": "sample-ways",
+  "name": "Sample Ways",
+  "theme": "test",
+  "description": "A plain 5x3 ways game used to validate the engine and simulator.",
+  "layout": "ways",
+  "reels": 5,
+  "rows": 3,
+  "volatility": "medium",
+  "tags": ["new"],
+  "betLevels": [20, 40, 100, 200],
+  "defaultBet": 100,
+  "targetRtp": { "min": 0.94, "max": 0.97 },
+  "symbols": [
+    { "id": "ten", "name": "10", "kind": "low", "pays": { "3": 0.05, "4": 0.1, "5": 0.25 } },
+    { "id": "jack", "name": "J", "kind": "low", "pays": { "3": 0.05, "4": 0.15, "5": 0.3 } },
+    { "id": "queen", "name": "Q", "kind": "low", "pays": { "3": 0.1, "4": 0.2, "5": 0.4 } },
+    { "id": "gem", "name": "Gem", "kind": "high", "pays": { "3": 0.2, "4": 0.5, "5": 1.5 } },
+    { "id": "crown", "name": "Crown", "kind": "high", "pays": { "3": 0.4, "4": 1, "5": 3 } },
+    { "id": "wild", "name": "Wild", "kind": "wild" },
+    { "id": "scatter", "name": "Scatter", "kind": "scatter" }
+  ],
+  "reelSets": {
+    "base": [
+      { "ten": 30, "jack": 30, "queen": 25, "gem": 12, "crown": 8, "scatter": 3 },
+      { "ten": 30, "jack": 30, "queen": 25, "gem": 12, "crown": 8, "wild": 4, "scatter": 3 },
+      { "ten": 30, "jack": 30, "queen": 25, "gem": 12, "crown": 8, "wild": 4, "scatter": 3 },
+      { "ten": 30, "jack": 30, "queen": 25, "gem": 12, "crown": 8, "wild": 4, "scatter": 3 },
+      { "ten": 30, "jack": 30, "queen": 25, "gem": 12, "crown": 8, "scatter": 3 }
+    ]
+  },
+  "params": { "note": "free-form, decoded by the game" }
+}

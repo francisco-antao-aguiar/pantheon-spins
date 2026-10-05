@@ -42,6 +42,7 @@ const (
 	minPasswordLen = 10
 	maxPasswordLen = 128
 	resetTokenTTL  = time.Hour
+	mailTimeout    = 30 * time.Second
 	defaultAvatar  = string(api.Raven)
 )
 
@@ -211,9 +212,15 @@ func (s *Service) RequestPasswordReset(ctx context.Context, email string) error 
 	}
 	link := s.appBaseURL + "/reset-password?token=" + token
 	body := fmt.Sprintf("Hi %s,\n\nReset your Pantheon Spins password here (valid for 1 hour):\n%s\n\nIf you did not ask for this, ignore this email.", u.Username, link)
-	if err := s.mailer.Send(ctx, u.Email, "Reset your Pantheon Spins password", body); err != nil {
-		s.log.ErrorContext(ctx, "send reset email", "err", err, "user_id", u.ID)
-	}
+	// Send in the background: waiting on the mail server only for existing
+	// accounts would reveal through response time which emails are registered.
+	sendCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), mailTimeout)
+	go func() {
+		defer cancel()
+		if err := s.mailer.Send(sendCtx, u.Email, "Reset your Pantheon Spins password", body); err != nil {
+			s.log.ErrorContext(sendCtx, "send reset email", "err", err, "user_id", u.ID)
+		}
+	}()
 	return nil
 }
 

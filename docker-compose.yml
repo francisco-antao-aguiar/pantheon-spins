@@ -27,6 +27,13 @@ services:
       timeout: 3s
       retries: 30
 
+  # Local mail server: catches every email the app sends.
+  # Inbox UI at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+
   server:
     build:
       context: .
@@ -39,6 +46,9 @@ services:
       # Local dev runs over plain http. Set to true behind HTTPS.
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      MAILER: smtp
+      SMTP_ADDR: mailpit:1025
+      SMTP_FROM: Pantheon Spins <no-reply@pantheon.local>
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL:-}
@@ -49,6 +59,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
   web:
     image: node:22-alpine
