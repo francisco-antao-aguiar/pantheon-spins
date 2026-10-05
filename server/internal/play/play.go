@@ -44,6 +44,31 @@ func NewService(pool *pgxpool.Pool, w *wallet.Service, reg *games.Registry) *Ser
 
 // Spin plays one paid spin of gameID for the user.
 func (s *Service) Spin(ctx context.Context, userID uuid.UUID, gameID string, bet int64) (api.SpinResult, error) {
+	return s.spin(ctx, userID, gameID, bet, func(g games.SlotGame, rng games.RNG) (games.SpinOutcome, error) {
+		return g.Spin(rng, bet)
+	})
+}
+
+// maxForceAttempts bounds ForceBonus. Bonuses trigger every few hundred spins.
+const maxForceAttempts = 1_000_000
+
+// ForceBonus plays a paid spin that triggers the game's bonus, by drawing
+// ordinary spins until one triggers and keeping that one. The outcome is a
+// genuine trigger, not a fabricated grid. It is a development tool: only the
+// devtools build exposes it over HTTP.
+func (s *Service) ForceBonus(ctx context.Context, userID uuid.UUID, gameID string, bet int64) (api.SpinResult, error) {
+	return s.spin(ctx, userID, gameID, bet, func(g games.SlotGame, rng games.RNG) (games.SpinOutcome, error) {
+		for range maxForceAttempts {
+			out, err := g.Spin(rng, bet)
+			if err != nil || out.Trigger != nil {
+				return out, err
+			}
+		}
+		return games.SpinOutcome{}, fmt.Errorf("play: %s: no bonus after %d spins", gameID, maxForceAttempts)
+	})
+}
+
+func (s *Service) spin(ctx context.Context, userID uuid.UUID, gameID string, bet int64, produce func(games.SlotGame, games.RNG) (games.SpinOutcome, error)) (api.SpinResult, error) {
 	game, ok := s.games.Get(gameID)
 	if !ok {
 		return api.SpinResult{}, ErrUnknownGame
@@ -67,7 +92,7 @@ func (s *Service) Spin(ctx context.Context, userID uuid.UUID, gameID string, bet
 		}
 
 		rng := s.newRNG()
-		out, err := game.Spin(rng, bet)
+		out, err := produce(game, rng)
 		if err != nil {
 			return fmt.Errorf("play: %s spin: %w", gameID, err)
 		}

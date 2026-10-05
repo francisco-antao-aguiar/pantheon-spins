@@ -4,7 +4,10 @@ WORKDIR /src/server
 COPY server/go.mod server/go.sum ./
 RUN go mod download
 COPY server/ ./
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/api ./cmd/api
+# GO_TAGS=devtools adds development-only endpoints (force a bonus). Local and
+# test builds only; production images must be built without it.
+ARG GO_TAGS=""
+RUN CGO_ENABLED=0 go build -tags "$GO_TAGS" -trimpath -ldflags="-s -w" -o /out/api ./cmd/api
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/api /api

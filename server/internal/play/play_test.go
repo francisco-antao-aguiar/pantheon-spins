@@ -3,6 +3,7 @@ package play_test
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -279,6 +280,34 @@ func TestConcurrentBonusActionsApplyOnce(t *testing.T) {
 	wg.Wait()
 	if ok.Load() != 1 || stale.Load() != 19 {
 		t.Fatalf("%d applied, %d stale; want 1 and 19", ok.Load(), stale.Load())
+	}
+	assertLedgerConsistent(t, user, 1000)
+}
+
+func TestForceBonus(t *testing.T) {
+	testutil.SkipIfShort(t)
+	ctx := context.Background()
+	game := &gamestest.Fake{ID: "fake-force", BonusEvery: 50, Picks: 1, PickValue: 1}
+	svc := newService(t, game)
+	user := testutil.NewUser(t, env.Pool, 1000)
+
+	res, err := svc.ForceBonus(ctx, user, game.ID, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.Bonus.Status != api.Active || res.Balance != 990 {
+		t.Fatalf("forced spin: bonus %+v balance %d", res.Bonus, res.Balance)
+	}
+	// It is a normal paid spin: one bet charged, one spin logged.
+	assertLedgerConsistent(t, user, 1000)
+	if _, err := svc.ForceBonus(ctx, user, game.ID, 10); !errors.Is(err, play.ErrBonusInProgress) {
+		t.Fatalf("second force while a bonus is active: %v", err)
+	}
+
+	never := &gamestest.Fake{ID: "fake-never"}
+	svc = newService(t, never)
+	if _, err := svc.ForceBonus(ctx, user, never.ID, 10); err == nil || !strings.Contains(err.Error(), "no bonus") {
+		t.Fatalf("game without a bonus: %v", err)
 	}
 	assertLedgerConsistent(t, user, 1000)
 }

@@ -1,0 +1,387 @@
+{
+  "$schema": "./schema/game-config.schema.json",
+  "id": "halls-of-valhalla",
+  "name": "Halls of Valhalla",
+  "theme": "norse",
+  "description": "1024 ways beneath the World Tree. Land three bonus symbols and the gods decide who leads your Ragnar\u00f6k Free Spins.",
+  "layout": "ways",
+  "reels": 5,
+  "rows": 4,
+  "volatility": "high",
+  "tags": [
+    "new",
+    "hot"
+  ],
+  "betLevels": [
+    20,
+    40,
+    100,
+    200,
+    400,
+    1000,
+    2000,
+    5000
+  ],
+  "defaultBet": 100,
+  "targetRtp": {
+    "min": 0.94,
+    "max": 0.97
+  },
+  "symbols": [
+    {
+      "id": "fehu",
+      "name": "Fehu Rune",
+      "kind": "low",
+      "pays": {
+        "3": 0.05,
+        "4": 0.1,
+        "5": 0.25
+      }
+    },
+    {
+      "id": "uruz",
+      "name": "Uruz Rune",
+      "kind": "low",
+      "pays": {
+        "3": 0.05,
+        "4": 0.1,
+        "5": 0.25
+      }
+    },
+    {
+      "id": "thurisaz",
+      "name": "Thurisaz Rune",
+      "kind": "low",
+      "pays": {
+        "3": 0.05,
+        "4": 0.15,
+        "5": 0.3
+      }
+    },
+    {
+      "id": "ansuz",
+      "name": "Ansuz Rune",
+      "kind": "low",
+      "pays": {
+        "3": 0.1,
+        "4": 0.15,
+        "5": 0.4
+      }
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "kind": "high",
+      "pays": {
+        "3": 0.15,
+        "4": 0.3,
+        "5": 0.75
+      }
+    },
+    {
+      "id": "axe",
+      "name": "Axe",
+      "kind": "high",
+      "pays": {
+        "3": 0.2,
+        "4": 0.4,
+        "5": 1
+      }
+    },
+    {
+      "id": "horn",
+      "name": "Mead Horn",
+      "kind": "high",
+      "pays": {
+        "3": 0.25,
+        "4": 0.6,
+        "5": 1.5
+      }
+    },
+    {
+      "id": "valkyrie",
+      "name": "Valkyrie",
+      "kind": "high",
+      "pays": {
+        "3": 0.4,
+        "4": 1,
+        "5": 2.5
+      }
+    },
+    {
+      "id": "wild",
+      "name": "Yggdrasil Wild",
+      "kind": "wild"
+    },
+    {
+      "id": "bonus_odin",
+      "name": "Odin",
+      "kind": "scatter"
+    },
+    {
+      "id": "bonus_thor",
+      "name": "Thor",
+      "kind": "scatter"
+    },
+    {
+      "id": "bonus_loki",
+      "name": "Loki",
+      "kind": "scatter"
+    }
+  ],
+  "reelSets": {
+    "base": [
+      {
+        "fehu": 80,
+        "uruz": 80,
+        "thurisaz": 72,
+        "ansuz": 64,
+        "shield": 44,
+        "axe": 36,
+        "horn": 28,
+        "valkyrie": 20,
+        "bonus_odin": 3,
+        "bonus_thor": 3,
+        "bonus_loki": 3
+      },
+      {
+        "fehu": 80,
+        "uruz": 80,
+        "thurisaz": 72,
+        "ansuz": 64,
+        "shield": 44,
+        "axe": 36,
+        "horn": 28,
+        "valkyrie": 20,
+        "wild": 17,
+        "bonus_odin": 3,
+        "bonus_thor": 3,
+        "bonus_loki": 3
+      },
+      {
+        "fehu": 80,
+        "uruz": 80,
+        "thurisaz": 72,
+        "ansuz": 64,
+        "shield": 44,
+        "axe": 36,
+        "horn": 28,
+        "valkyrie": 20,
+        "wild": 17,
+        "bonus_odin": 3,
+        "bonus_thor": 3,
+        "bonus_loki": 3
+      },
+      {
+        "fehu": 80,
+        "uruz": 80,
+        "thurisaz": 72,
+        "ansuz": 64,
+        "shield": 44,
+        "axe": 36,
+        "horn": 28,
+        "valkyrie": 20,
+        "wild": 17,
+        "bonus_odin": 3,
+        "bonus_thor": 3,
+        "bonus_loki": 3
+      },
+      {
+        "fehu": 80,
+        "uruz": 80,
+        "thurisaz": 72,
+        "ansuz": 64,
+        "shield": 44,
+        "axe": 36,
+        "horn": 28,
+        "valkyrie": 20,
+        "wild": 17,
+        "bonus_odin": 2,
+        "bonus_thor": 2,
+        "bonus_loki": 2
+      }
+    ],
+    "free": [
+      {
+        "fehu": 40,
+        "uruz": 40,
+        "thurisaz": 36,
+        "ansuz": 32,
+        "shield": 24,
+        "axe": 20,
+        "horn": 16,
+        "valkyrie": 12,
+        "bonus_odin": 1,
+        "bonus_thor": 1,
+        "bonus_loki": 1
+      },
+      {
+        "fehu": 40,
+        "uruz": 40,
+        "thurisaz": 36,
+        "ansuz": 32,
+        "shield": 24,
+        "axe": 20,
+        "horn": 16,
+        "valkyrie": 12,
+        "wild": 21,
+        "bonus_odin": 1,
+        "bonus_thor": 1,
+        "bonus_loki": 1
+      },
+      {
+        "fehu": 40,
+        "uruz": 40,
+        "thurisaz": 36,
+        "ansuz": 32,
+        "shield": 24,
+        "axe": 20,
+        "horn": 16,
+        "valkyrie": 12,
+        "wild": 21,
+        "bonus_odin": 1,
+        "bonus_thor": 1,
+        "bonus_loki": 1
+      },
+      {
+        "fehu": 40,
+        "uruz": 40,
+        "thurisaz": 36,
+        "ansuz": 32,
+        "shield": 24,
+        "axe": 20,
+        "horn": 16,
+        "valkyrie": 12,
+        "wild": 21,
+        "bonus_odin": 1,
+        "bonus_thor": 1,
+        "bonus_loki": 1
+      },
+      {
+        "fehu": 40,
+        "uruz": 40,
+        "thurisaz": 36,
+        "ansuz": 32,
+        "shield": 24,
+        "axe": 20,
+        "horn": 16,
+        "valkyrie": 12,
+        "wild": 21,
+        "bonus_odin": 1,
+        "bonus_thor": 1,
+        "bonus_loki": 1
+      }
+    ]
+  },
+  "params": {
+    "wild": "wild",
+    "scatters": {
+      "odin": "bonus_odin",
+      "thor": "bonus_thor",
+      "loki": "bonus_loki"
+    },
+    "freeSpins": {
+      "3": 10,
+      "4": 12,
+      "5": 15
+    },
+    "retrigger": {
+      "scatters": 3,
+      "spins": 5
+    },
+    "maxFreeSpins": 50,
+    "maxWinX": 5000,
+    "odin": {
+      "ravens": [
+        {
+          "value": 0,
+          "weight": 10
+        },
+        {
+          "value": 1,
+          "weight": 25
+        },
+        {
+          "value": 2,
+          "weight": 30
+        },
+        {
+          "value": 3,
+          "weight": 20
+        },
+        {
+          "value": 4,
+          "weight": 10
+        },
+        {
+          "value": 5,
+          "weight": 5
+        }
+      ],
+      "reels": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "thor": {
+      "multipliers": [
+        {
+          "value": 1,
+          "weight": 15
+        },
+        {
+          "value": 2,
+          "weight": 25
+        },
+        {
+          "value": 3,
+          "weight": 20
+        },
+        {
+          "value": 5,
+          "weight": 20
+        },
+        {
+          "value": 10,
+          "weight": 12
+        },
+        {
+          "value": 25,
+          "weight": 8
+        }
+      ]
+    },
+    "loki": {
+      "cells": [
+        {
+          "value": 0,
+          "weight": 20
+        },
+        {
+          "value": 4,
+          "weight": 30
+        },
+        {
+          "value": 5,
+          "weight": 30
+        },
+        {
+          "value": 7,
+          "weight": 20
+        }
+      ],
+      "targets": {
+        "fehu": 3,
+        "uruz": 3,
+        "thurisaz": 3,
+        "ansuz": 3,
+        "shield": 4,
+        "axe": 4,
+        "horn": 3,
+        "valkyrie": 2
+      }
+    }
+  }
+}
