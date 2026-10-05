@@ -666,6 +666,12 @@ components:
           type: array
           description: Reels on which to play the slow-down near-trigger animation
           items: { type: integer }
+        data:
+          type: object
+          description: |
+            What the trigger decided, for the reveal animation (e.g. which god
+            the bonus symbols chose and how many free spins were awarded).
+          additionalProperties: true
 
     SpinOutcome:
       type: object
@@ -765,10 +771,11 @@ components:
 
     BonusStepResult:
       type: object
-      required: [state, stepWin, balance]
+      required: [state, stepWin, winTier, balance]
       properties:
         state: { $ref: "#/components/schemas/BonusState" }
         stepWin: { $ref: "#/components/schemas/Coins" }
+        winTier: { $ref: "#/components/schemas/WinTier" }
         balance: { $ref: "#/components/schemas/Coins" }
         outcome:
           $ref: "#/components/schemas/SpinOutcome"

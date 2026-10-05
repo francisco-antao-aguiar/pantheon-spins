@@ -116,6 +116,9 @@ func run() error {
 		WriteTimeout:      30 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}
+	if httpapi.DevToolsEnabled {
+		log.Warn("DEVELOPMENT TOOLS ENABLED: this build can force bonuses; never deploy it")
+	}
 	errc := make(chan error, 1)
 	go func() {
 		log.Info("listening", "addr", cfg.HTTPAddr, "games", len(registry.List()), "google_auth", google != nil, "mailer", cfg.Mailer)

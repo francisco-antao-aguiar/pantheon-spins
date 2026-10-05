@@ -78,6 +78,7 @@ func NewHandler(d Deps) http.Handler {
 	r.Use(requestLogger(d.Log), recoverer(d.Log), securityHeaders)
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Use(s.csrf.middleware, sessionMiddleware(d.Auth.Sessions(), d.Log))
+		s.devRoutes(r)
 		api.HandlerWithOptions(s, api.ChiServerOptions{
 			BaseRouter: r,
 			ErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {

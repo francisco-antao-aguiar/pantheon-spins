@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3a6e"/><stop offset="1" stop-color="#081428"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#e3b23c"/><stop offset="1" stop-color="#5a3d0c"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#9fd0ff" stop-opacity=".35"/><stop offset="1" stop-color="#9fd0ff" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f6fa"/><stop offset=".5" stop-color="#9aa8b8"/><stop offset="1" stop-color="#4b5666"/></linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="34" fill="url(#rim)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#glow)"/>
+  
+  <path d="M54 92 Q128 52 202 92 Q128 80 54 92 Z" fill="#283a5e"/>
+  <path d="M84 92 Q84 52 128 46 Q172 52 172 92 Z" fill="#33496f" stroke="#1b2740" stroke-width="4"/>
+  <ellipse cx="128" cy="112" rx="40" ry="36" fill="#f0c9a0"/>
+  <path d="M92 104 L164 120" stroke="#1b1b1b" stroke-width="7"/>
+  <ellipse cx="146" cy="112" rx="13" ry="10" fill="#1b1b1b"/>
+  <circle cx="110" cy="110" r="6" fill="#2b4f8f"/>
+  <path d="M88 124 Q92 196 128 200 Q164 196 168 124 Q148 140 128 140 Q108 140 88 124 Z" fill="#e8ecf2" stroke="#9aa3b0" stroke-width="3"/>
+  <text x="128" y="226" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="26" fill="#fff6dc" stroke="#2a1600" stroke-width="5" paint-order="stroke" letter-spacing="2">ODIN</text>
+</svg>
+<!-- bonus_odin -->

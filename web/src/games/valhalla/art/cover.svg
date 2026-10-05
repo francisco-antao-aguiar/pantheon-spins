@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1633"/><stop offset=".6" stop-color="#1d3a6e"/><stop offset="1" stop-color="#3a2a5c"/></linearGradient>
+    <linearGradient id="aur" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5bffb0" stop-opacity="0"/><stop offset=".5" stop-color="#5bffb0" stop-opacity=".55"/><stop offset="1" stop-color="#9d7bff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".55" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+  </defs>
+  <rect width="500" height="300" fill="url(#sky)"/>
+  <path d="M0 90 Q120 30 250 80 T500 60 L500 110 Q380 130 250 120 T0 140 Z" fill="url(#aur)"/>
+  <path d="M0 230 L70 150 L120 200 L190 120 L260 210 L330 140 L400 200 L460 160 L500 190 L500 300 L0 300 Z" fill="#141a2e"/>
+  <path d="M190 120 L210 142 L180 140 Z M330 140 L348 160 L318 158 Z" fill="#e8f0ff" opacity=".8"/>
+  <path d="M160 300 L160 200 L250 150 L340 200 L340 300 Z" fill="#2a1d10" stroke="url(#gold)" stroke-width="4"/>
+  <path d="M150 204 L250 146 L350 204" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="226" y="236" width="48" height="64" rx="24" fill="#ffcf6a" opacity=".85"/>
+  <text x="250" y="58" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="40" fill="url(#gold)" stroke="#2a1600" stroke-width="2" letter-spacing="3">HALLS OF</text>
+  <text x="250" y="108" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="54" fill="url(#gold)" stroke="#2a1600" stroke-width="2.5" letter-spacing="4">VALHALLA</text>
+</svg>

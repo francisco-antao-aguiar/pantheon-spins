@@ -44,6 +44,51 @@ cd web && npm test                                    # Vitest
 
 With Go installed locally, the same commands work from `server/` directly.
 
+## Games
+
+| Game | Layout | Bonus | RTP (10M spins) |
+| ---- | ------ | ----- | --------------- |
+| Halls of Valhalla | 5×4, 1024 ways | Ragnarök Free Spins: the god with the most of the 3+ bonus symbols leads (Odin: raven wilds, Thor: lightning multipliers, Loki: transforms) | 95.66% ± 0.38% |
+
+Each game is a Go package under `server/internal/games/<game>` with a config in
+`game-configs/`, and a PixiJS renderer under `web/src/games/<game>` implementing
+`GameRenderer`. Register new games in `server/internal/games/catalog` and
+`web/src/games/registry.ts`.
+
+Bonuses never ask the player to choose: the symbols that trigger a bonus decide
+its variant.
+
+### Dev tools
+
+The Compose server is built with the `devtools` Go tag. It adds
+`POST /api/v1/dev/force-bonus/{gameId}` and a **DEV bonus** button on the game
+screen, which play a paid spin that genuinely triggers the bonus. Production
+images must be built without `GO_TAGS=devtools`.
+
+### Art and audio
+
+Placeholder SVG art and synthesized audio come from scripts, so final assets can
+replace the files without code changes:
+
+```bash
+cd web && npm run gen:art && npm run gen:audio
+```
+
+## End-to-end tests
+
+Playwright runs against the running Compose stack (desktop and portrait phone):
+
+```bash
+docker compose up -d --build
+cd web && npx playwright install chromium && npm run e2e
+```
+
+Registration is rate-limited to 10 per hour per IP. When re-running often, clear the limits:
+
+```bash
+docker compose exec redis sh -c "redis-cli --scan --pattern 'rl:*' | xargs -r redis-cli del"
+```
+
 ## Server layout
 
 - `cmd/api` – HTTP server entrypoint

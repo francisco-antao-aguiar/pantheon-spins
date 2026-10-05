@@ -1,0 +1,90 @@
+import { expect, test, type Page } from "@playwright/test";
+
+const GAME = "halls-of-valhalla";
+
+/** Reads the balance from the game's top bar (locale-formatted digits). */
+async function balance(page: Page) {
+  const text = await page.locator("header").innerText();
+  return Number(text.replace(/[^\d]/g, ""));
+}
+
+/** "7 of 10 spins left" → 7 */
+async function spinsLeft(page: Page) {
+  const text = await page.getByText(/\d+ of \d+ spins left/).innerText();
+  return Number(/(\d+) of/.exec(text)![1]);
+}
+
+test("register, log in, spin, and resume a bonus after a reload", async ({ page }) => {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const email = `e2e_${id}@example.test`;
+  const password = `e2e-password-${id}`;
+
+  // Register: new players start with 10,000 Coins.
+  await page.goto("/register");
+  await page.getByLabel("Username").fill(`e2e_${id}`);
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByRole("heading", { name: "Choose your realm" })).toBeVisible();
+
+  // Sign out, then log back in.
+  await page.goto("/profile");
+  await page.getByRole("button", { name: "Sign out" }).last().click();
+  await expect(page).toHaveURL(/\/login$/);
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("heading", { name: "Choose your realm" })).toBeVisible();
+
+  // Open the game from the lobby.
+  await page.getByRole("link", { name: /Halls of Valhalla/ }).click();
+  await expect(page).toHaveURL(new RegExp(`/play/${GAME}$`));
+  await expect(page.locator("canvas")).toBeVisible();
+  const spin = page.getByRole("button", { name: "Spin", exact: true });
+  await expect(spin).toBeEnabled();
+  await page.getByRole("button", { name: "TURBO" }).click();
+  expect(await balance(page)).toBe(10_000);
+
+  // One paid spin: the server records it and the balance reflects bet and win.
+  await spin.click();
+  await expect(spin).toBeDisabled();
+  await expect(spin).toBeEnabled();
+  const history = await (await page.request.get("/api/v1/spins")).json();
+  expect(history.items).toHaveLength(1);
+  const wallet = await (await page.request.get("/api/v1/wallet")).json();
+  expect(wallet.balance).toBe(10_000 - history.items[0].bet + history.items[0].win);
+  expect(await balance(page)).toBe(wallet.balance);
+
+  // Force a bonus (devtools build) and play part of it.
+  await page.getByRole("button", { name: "DEV bonus" }).click();
+  const start = page.getByRole("button", { name: "Start free spins" });
+  await expect(start).toBeVisible({ timeout: 60_000 });
+  const total = await spinsLeft(page);
+  expect(total).toBeGreaterThanOrEqual(10);
+  await start.click();
+  await expect(page.getByText(new RegExp(`^${total - 1} of \\d+ spins left`))).toBeVisible({ timeout: 60_000 });
+  await page.getByRole("button", { name: "Pause" }).click();
+  const resume = page.getByRole("button", { name: "Continue" });
+  await expect(resume).toBeVisible({ timeout: 60_000 });
+  const left = await spinsLeft(page);
+  expect(left).toBeLessThan(total);
+
+  // Reload: the bonus resumes exactly where it stopped.
+  await page.reload();
+  await expect(resume).toBeVisible();
+  expect(await spinsLeft(page)).toBe(left);
+  const active = await page.request.get(`/api/v1/games/${GAME}/bonus`);
+  expect(active.status()).toBe(200);
+  expect((await active.json()).data.spinsLeft).toBe(left);
+
+  // A new paid spin is refused while the bonus is unresolved.
+  await expect(spin).toBeDisabled();
+
+  // Finish the bonus.
+  await resume.click();
+  await expect(page.getByText(/spins left/)).toBeHidden({ timeout: 150_000 });
+  await expect(spin).toBeEnabled();
+  expect((await page.request.get(`/api/v1/games/${GAME}/bonus`)).status()).toBe(204);
+  const after = await (await page.request.get("/api/v1/wallet")).json();
+  expect(await balance(page)).toBe(after.balance);
+});

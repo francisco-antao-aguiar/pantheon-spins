@@ -18,6 +18,8 @@ import (
 // in game-configs/schema/game-config.schema.json. Game-specific settings live
 // in Params, which each game decodes into its own struct.
 type Config struct {
+	// Schema is the optional "$schema" hint for editors; it is ignored.
+	Schema      string             `json:"$schema,omitempty"`
 	ID          string             `json:"id"`
 	Name        string             `json:"name"`
 	Theme       string             `json:"theme"`

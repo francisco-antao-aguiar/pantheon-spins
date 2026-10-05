@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"pantheon-spins/server/internal/games"
+	"pantheon-spins/server/internal/games/valhalla"
 )
 
 // Factory builds a game from the game-config directory.
@@ -15,7 +16,7 @@ type Factory func(configDir string) (games.SlotGame, error)
 // factories returns every game's constructor.
 func factories() []Factory {
 	return []Factory{
-		// Games are added here as they are built (Halls of Valhalla is next).
+		valhalla.New,
 	}
 }
 

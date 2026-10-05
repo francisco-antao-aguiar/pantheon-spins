@@ -38,6 +38,9 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
+      args:
+        # Local dev only: enables the "force bonus" dev tool in the game screen.
+        GO_TAGS: devtools
     environment:
       DATABASE_URL: postgres://pantheon:pantheon@postgres:5432/pantheon?sslmode=disable
       REDIS_URL: redis://redis:6379/0
@@ -68,6 +71,7 @@ services:
     command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
     environment:
       VITE_API_PROXY: http://server:8080
+      VITE_POLL: "1"
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:
