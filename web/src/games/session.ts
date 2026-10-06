@@ -37,7 +37,7 @@ export interface SlotSessionState {
   stopAutoplay(message?: string): void;
   playBonus(): Promise<void>;
   pauseBonus(): void;
-  /** Loads an unresolved bonus from the server and restores it. */
+  /** Loads an unresolved bonus from the server, restores it and plays it on. */
   resume(): Promise<void>;
   dismissMessage(): void;
 }
@@ -116,15 +116,11 @@ export function createSlotSession(info: GameInfo, initialBet: number, deps: Slot
         if (res.bonusTrigger && res.bonus) {
           await deps.renderer.playBonusIntro(res.bonusTrigger, res.bonus, opts);
           set({ phase: "bonus", bonus: res.bonus, bonusPaused: false });
-          if (get().autoplay) {
-            // Bonuses have no choices, so autoplay plays them through unless it stops on bonus.
-            const run = get().autoplay!;
-            if (run.stopOnBonus) {
-              get().stopAutoplay(STOP_MESSAGES.bonus);
-              return;
-            }
-            await get().playBonus();
-            await continueAutoplay({ win: res.totalWin + (get().lastWin ?? 0), bonusTriggered: true });
+          // Bonuses have no choices, so free spins start on their own.
+          if (get().autoplay?.stopOnBonus) get().stopAutoplay(STOP_MESSAGES.bonus);
+          await get().playBonus();
+          if (get().autoplay && get().phase === "idle") {
+            await continueAutoplay({ win: res.totalWin + get().lastWin, bonusTriggered: true });
           }
           return;
         }
@@ -193,6 +189,8 @@ export function createSlotSession(info: GameInfo, initialBet: number, deps: Slot
           if (res.response.status === 200 && res.data) {
             deps.renderer.resumeBonus(res.data);
             set({ bonus: res.data, phase: "bonus", lastWin: res.data.totalWin, bonusPaused: false });
+            // Carry on where it stopped, without waiting for the player.
+            void get().playBonus();
           }
         } catch (err) {
           set({ message: errorText(err) });

@@ -142,7 +142,7 @@ describe("slot session", () => {
     expect(store.getState().message).toContain("Try 40");
   });
 
-  it("enters the bonus after a trigger and plays every free spin to the end", async () => {
+  it("starts free spins on its own after a trigger and plays them to the end", async () => {
     const b0 = bonusState();
     const b1 = bonusState({ step: 1, totalWin: 200, data: { god: "thor", spinsLeft: 1, spinsPlayed: 1, totalSpins: 2 } });
     const b2 = bonusState({ step: 2, totalWin: 1_400, status: "completed", actions: [], data: { god: "thor", spinsLeft: 0, spinsPlayed: 2, totalSpins: 2 } });
@@ -151,10 +151,8 @@ describe("slot session", () => {
       [ACTION]: [json(200, stepResult(b1, 200, 10_100)), json(200, stepResult(b2, 1_200, 11_300))],
     });
     await store.getState().spin();
-    expect(store.getState()).toMatchObject({ phase: "bonus", bonus: b0 });
-    expect(calls).toContain("bonusIntro");
 
-    await store.getState().playBonus();
+    expect(calls.indexOf("bonusIntro")).toBeLessThan(calls.indexOf("bonusStep"));
     expect(requests.filter((r) => r.path === ACTION).map((r) => r.body)).toEqual([
       { action: "spin", step: 0 },
       { action: "spin", step: 1 },
@@ -174,19 +172,20 @@ describe("slot session", () => {
       [ACTION]: [json(409, { code: "stale_step", message: "moved on" }), json(200, stepResult(b2, 0, 9_900))],
     });
     await store.getState().resume();
-    expect(store.getState().phase).toBe("bonus");
-    await store.getState().playBonus();
+    await vi.waitFor(() => expect(store.getState().phase).toBe("idle"));
     const steps = requests.filter((r) => r.path === ACTION).map((r) => (r.body as { step: number }).step);
     expect(steps).toEqual([0, 1]);
-    expect(store.getState().phase).toBe("idle");
   });
 
-  it("resumes an unfinished bonus after a reload", async () => {
+  it("resumes an unfinished bonus after a reload, from the same step", async () => {
     const b = bonusState({ step: 3, totalWin: 500 });
-    const { store, calls } = setup({ [BONUS]: [json(200, b)] });
+    const done = bonusState({ step: 4, totalWin: 500, status: "completed", actions: [] });
+    const { store, calls, requests } = setup({ [BONUS]: [json(200, b)], [ACTION]: [json(200, stepResult(done, 0, 9_900))] });
     await store.getState().resume();
-    expect(calls).toEqual(["resumeBonus"]);
-    expect(store.getState()).toMatchObject({ phase: "bonus", bonus: b, lastWin: 500 });
+    expect(calls[0]).toBe("resumeBonus");
+    await vi.waitFor(() => expect(store.getState().phase).toBe("idle"));
+    expect(requests.find((r) => r.path === ACTION)?.body).toEqual({ action: "spin", step: 3 });
+    expect(calls.at(-1)).toBe("bonusEnd");
   });
 
   it("stays in the base game when there is no bonus to resume", async () => {
@@ -196,16 +195,23 @@ describe("slot session", () => {
     expect(store.getState().phase).toBe("idle");
   });
 
-  it("pauses free spins between steps", async () => {
+  it("pauses free spins between steps and continues on request", async () => {
     const b0 = bonusState();
     const b1 = bonusState({ step: 1, data: { god: "loki", spinsLeft: 1, spinsPlayed: 1, totalSpins: 2 } });
-    const { store, requests } = setup({ [BONUS]: [json(200, b0)], [ACTION]: [json(200, stepResult(b1, 0, 9_900))] });
+    const b2 = bonusState({ step: 2, status: "completed", actions: [] });
+    const { store, requests } = setup({
+      [BONUS]: [json(200, b0)],
+      [ACTION]: [json(200, stepResult(b1, 0, 9_900)), json(200, stepResult(b2, 0, 9_900))],
+    });
     await store.getState().resume();
-    const playing = store.getState().playBonus();
     store.getState().pauseBonus();
-    await playing;
+    await vi.waitFor(() => expect(store.getState().phase).toBe("bonus"));
     expect(requests.filter((r) => r.path === ACTION)).toHaveLength(1);
-    expect(store.getState()).toMatchObject({ phase: "bonus", bonus: b1 });
+    expect(store.getState().bonus).toEqual(b1);
+
+    await store.getState().playBonus();
+    expect(requests.filter((r) => r.path === ACTION)).toHaveLength(2);
+    expect(store.getState().phase).toBe("idle");
   });
 
   it("autoplays the requested number of spins", async () => {
@@ -217,14 +223,29 @@ describe("slot session", () => {
     expect(store.getState().message).toBe("Autoplay finished.");
   });
 
-  it("stops autoplay on a bonus when asked to", async () => {
+  it("stops autoplay on a bonus when asked to, but still plays the bonus", async () => {
     const { store, requests } = setup({
       [SPIN]: [json(200, spinResult({ bonusTrigger: { kind: "free_spins", positions: [] }, bonus: bonusState() }))],
+      [ACTION]: [json(200, stepResult(bonusState({ step: 1, status: "completed", actions: [] }), 0, 9_900))],
     });
     store.getState().startAutoplay({ spins: 10, stopOnBonus: true, stopOnWinX: null, lossLimit: null });
+    await vi.waitFor(() => expect(store.getState().phase).toBe("idle"));
+    expect(requests.map((r) => r.path)).toEqual([SPIN, ACTION]);
+    expect(store.getState()).toMatchObject({ autoplay: null, message: "Autoplay stopped: bonus triggered." });
+  });
+
+  it("keeps autoplaying after a bonus when not told to stop", async () => {
+    const { store, requests } = setup({
+      [SPIN]: [
+        json(200, spinResult({ bonusTrigger: { kind: "free_spins", positions: [] }, bonus: bonusState() })),
+        json(200, spinResult({ balance: 9_800 })),
+      ],
+      [ACTION]: [json(200, stepResult(bonusState({ step: 1, status: "completed", actions: [] }), 0, 9_900))],
+    });
+    store.getState().startAutoplay({ spins: 2, stopOnBonus: false, stopOnWinX: null, lossLimit: null });
     await vi.waitFor(() => expect(store.getState().autoplay).toBeNull());
-    expect(requests).toHaveLength(1);
-    expect(store.getState()).toMatchObject({ phase: "bonus", message: "Autoplay stopped: bonus triggered." });
+    expect(requests.map((r) => r.path)).toEqual([SPIN, ACTION, SPIN]);
+    expect(store.getState().message).toBe("Autoplay finished.");
   });
 
   it("does not change the bet while spinning or autoplaying", async () => {

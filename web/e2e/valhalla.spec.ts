@@ -8,10 +8,11 @@ async function balance(page: Page) {
   return Number(text.replace(/[^\d]/g, ""));
 }
 
-/** "7 of 10 spins left" → 7 */
-async function spinsLeft(page: Page) {
+/** "7 of 10 spins left" → { left: 7, total: 10, played: 3 } */
+async function spinCounts(page: Page) {
   const text = await page.getByText(/\d+ of \d+ spins left/).innerText();
-  return Number(/(\d+) of/.exec(text)![1]);
+  const [, left, total] = /(\d+) of (\d+)/.exec(text)!.map(Number) as [number, number, number];
+  return { left, total, played: total - left };
 }
 
 test("register, log in, spin, and resume a bonus after a reload", async ({ page }) => {
@@ -55,33 +56,27 @@ test("register, log in, spin, and resume a bonus after a reload", async ({ page 
   expect(wallet.balance).toBe(10_000 - history.items[0].bet + history.items[0].win);
   expect(await balance(page)).toBe(wallet.balance);
 
-  // Force a bonus (devtools build) and play part of it.
+  // Force a bonus (devtools build). Free spins start on their own.
   await page.getByRole("button", { name: "DEV bonus" }).click();
-  const start = page.getByRole("button", { name: "Start free spins" });
-  await expect(start).toBeVisible({ timeout: 60_000 });
-  const total = await spinsLeft(page);
-  expect(total).toBeGreaterThanOrEqual(10);
-  await start.click();
-  await expect(page.getByText(new RegExp(`^${total - 1} of \\d+ spins left`))).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/spins left/)).toBeVisible({ timeout: 60_000 });
+  await expect.poll(async () => (await spinCounts(page)).played, { timeout: 60_000 }).toBeGreaterThan(0);
   await page.getByRole("button", { name: "Pause" }).click();
   const resume = page.getByRole("button", { name: "Continue" });
   await expect(resume).toBeVisible({ timeout: 60_000 });
-  const left = await spinsLeft(page);
-  expect(left).toBeLessThan(total);
 
-  // Reload: the bonus resumes exactly where it stopped.
-  await page.reload();
-  await expect(resume).toBeVisible();
-  expect(await spinsLeft(page)).toBe(left);
-  const active = await page.request.get(`/api/v1/games/${GAME}/bonus`);
-  expect(active.status()).toBe(200);
-  expect((await active.json()).data.spinsLeft).toBe(left);
+  const paused = await (await page.request.get(`/api/v1/games/${GAME}/bonus`)).json();
+  expect(paused.status).toBe("active");
+  expect(paused.data.spinsLeft).toBe((await spinCounts(page)).left);
 
   // A new paid spin is refused while the bonus is unresolved.
   await expect(spin).toBeDisabled();
 
-  // Finish the bonus.
-  await resume.click();
+  // Reload: the bonus resumes on its own, exactly where it stopped.
+  const firstAction = page.waitForRequest((r) => r.url().endsWith(`/games/${GAME}/bonus/actions`));
+  await page.reload();
+  expect((await firstAction).postDataJSON()).toEqual({ action: "spin", step: paused.step });
+
+  // It plays through to the end.
   await expect(page.getByText(/spins left/)).toBeHidden({ timeout: 150_000 });
   await expect(spin).toBeEnabled();
   expect((await page.request.get(`/api/v1/games/${GAME}/bonus`)).status()).toBe(204);

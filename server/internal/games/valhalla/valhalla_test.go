@@ -61,6 +61,11 @@ func TestConfigIsValid(t *testing.T) {
 	}
 }
 
+// valkyrie returns what n valkyries in a row pay per way, in Coins at bet 100.
+func valkyrie(g *Game, n int) int64 {
+	return g.Pays.Pay(g.Symbols.MustLookup("valkyrie"), n).Coins(100)
+}
+
 func TestBaseSpin(t *testing.T) {
 	g := load(t)
 	rng := &gamestest.ScriptedRNG{}
@@ -76,12 +81,12 @@ func TestBaseSpin(t *testing.T) {
 		{
 			name:    "valkyrie on three reels, one way",
 			rows:    []string{"V V V u f", "t a t a t", "S X S X S", "H f H f H"},
-			wantWin: 40, // 0.4× of 100
+			wantWin: valkyrie(g, 3),
 		},
 		{
 			name:    "wild substitutes: 2 × 2 ways of valkyrie on four reels",
 			rows:    []string{"V V V V f", "V W t S t", "f S a X S", "u X H H X"},
-			wantWin: 4 * 100, // 1× per way, 4 ways
+			wantWin: 4 * valkyrie(g, 4), // 4 ways
 		},
 		{
 			name:    "two bonus symbols: anticipation, no trigger",
@@ -240,7 +245,8 @@ func TestOdinRavens(t *testing.T) {
 func TestThorLightning(t *testing.T) {
 	g := load(t)
 	rng := games.NewCryptoRNG()
-	// Valkyrie on three reels pays 0.4× = 8 units without a multiplier.
+	// Valkyrie on three reels, one way; lightning multiplies it.
+	base := valkyrie(g, 3)
 	landed := grid(g, "V V V u f", "t a t a t", "S X S X S", "H f H f H")
 	allowed := map[int64]bool{}
 	for _, v := range g.thor.values {
@@ -259,7 +265,7 @@ func TestThorLightning(t *testing.T) {
 			m = e.Value
 			seen++
 		}
-		if step.Win != 40*m || int64(st.Multiplier) != map[bool]int64{true: m, false: 0}[m > 1] {
+		if step.Win != base*m || int64(st.Multiplier) != map[bool]int64{true: m, false: 0}[m > 1] {
 			t.Fatalf("win %d with multiplier %d (step multiplier %d)", step.Win, m, st.Multiplier)
 		}
 	}
@@ -329,7 +335,7 @@ func TestRetrigger(t *testing.T) {
 
 func TestWinCap(t *testing.T) {
 	g := load(t)
-	landed := grid(g, "V V V u f", "t a t a t", "S X S X S", "H f H f H") // pays 8 units
+	landed := grid(g, "V V V u f", "t a t a t", "S X S X S", "H f H f H") // pays more than 3 units
 	limit := games.Units(g.p.MaxWinX * games.UnitsPerBet)
 	s, step := g.freeSpin(&gamestest.ScriptedRNG{}, state{God: Thor, Bet: 100, SpinsLeft: 5, Total: 5, Win: limit - 3}, landed)
 	if !s.Capped || s.Win != limit || step.Win != games.Units(3).Coins(100) {
