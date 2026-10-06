@@ -46,17 +46,20 @@ With Go installed locally, the same commands work from `server/` directly.
 
 ## Games
 
-| Game | Layout | Bonus | RTP (10M spins) |
-| ---- | ------ | ----- | --------------- |
-| Halls of Valhalla | 5×4, 1024 ways | Ragnarök Free Spins: the god with the most of the 3+ bonus symbols leads (Odin: raven wilds, Thor: lightning multipliers, Loki: transforms) | 95.66% ± 0.38% |
+| Game | Layout | Bonus | RTP (10M spins) | Hit freq. |
+| ---- | ------ | ----- | --------------- | --------- |
+| Halls of Valhalla | 5×4, 1024 ways | Ragnarök Free Spins: the god with the most of the 3+ bonus symbols leads (Odin: raven wilds, Thor: lightning multipliers, Loki: transforms) | 95.10% ± 0.42% | 39.8% |
 
 Each game is a Go package under `server/internal/games/<game>` with a config in
 `game-configs/`, and a PixiJS renderer under `web/src/games/<game>` implementing
 `GameRenderer`. Register new games in `server/internal/games/catalog` and
 `web/src/games/registry.ts`.
 
-Bonuses never ask the player to choose: the symbols that trigger a bonus decide
-its variant.
+Design defaults for every game:
+
+- Bonuses never ask the player to choose: the symbols that trigger a bonus decide its variant.
+- Free spins start and play on their own (with Pause/Continue), including after a reload.
+- Hit frequency around 40%, and a bonus win cap of 10,000× bet.
 
 ### Dev tools
 

@@ -189,7 +189,7 @@ function BonusPanel({ session, module }: { session: SlotSession; module: GameMod
             onClick={() => void session.getState().playBonus()}
             className="rounded-xl bg-gradient-to-b from-gold-300 to-gold-600 px-4 py-2 font-semibold text-night-950"
           >
-            {bonus.step === 0 && !paused ? "Start free spins" : "Continue"}
+            Continue
           </button>
         )}
         {phase === "bonusPlaying" && (
@@ -255,6 +255,7 @@ function Controls({ session, renderer, devtools }: { session: SlotSession; rende
     useSession.getState().setBalance(spin.balance);
     if (spin.bonusTrigger && spin.bonus) await renderer.playBonusIntro(spin.bonusTrigger, spin.bonus, opts);
     session.setState({ phase: "bonus", bonus: spin.bonus ?? null, lastWin: spin.totalWin });
+    void session.getState().playBonus();
   };
 
   return (
