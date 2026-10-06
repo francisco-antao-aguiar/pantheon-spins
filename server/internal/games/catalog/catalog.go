@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"pantheon-spins/server/internal/games"
+	"pantheon-spins/server/internal/games/eyeofra"
 	"pantheon-spins/server/internal/games/valhalla"
 )
 
@@ -17,6 +18,7 @@ type Factory func(configDir string) (games.SlotGame, error)
 func factories() []Factory {
 	return []Factory{
 		valhalla.New,
+		eyeofra.New,
 	}
 }
 

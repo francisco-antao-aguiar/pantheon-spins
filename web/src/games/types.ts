@@ -5,6 +5,10 @@ import type { SoundManager } from "../audio/sound";
 export type BonusStepResult = Schemas["BonusStepResult"];
 export type BonusTrigger = Schemas["BonusTrigger"];
 export type WinTier = Schemas["WinTier"];
+export type BonusAction = { action: string; choice?: string };
+
+/** Bonus kinds whose actions spin the reels (the session starts the reels before the request). */
+export const SPIN_BONUSES: Schemas["BonusKind"][] = ["free_spins", "hold_and_win"];
 
 export interface RendererContext {
   app: Application;
@@ -37,6 +41,13 @@ export interface GameRenderer {
   playSpin(result: SpinResult, opts: PlayOptions): Promise<void>;
   /** Shows the bonus trigger and intro. */
   playBonusIntro(trigger: BonusTrigger, bonus: BonusState, opts: PlayOptions): Promise<void>;
+  /**
+   * For bonuses the player interacts with (pick games): resolves with the
+   * player's next action, e.g. the urn they tapped. With auto set (autoplay),
+   * the renderer chooses on its own. Bonuses without it just send their first
+   * offered action ("spin").
+   */
+  chooseBonusAction?(bonus: BonusState, opts: { auto: boolean }): Promise<BonusAction>;
   /** Animates one bonus action's result. */
   playBonusStep(step: BonusStepResult, opts: PlayOptions): Promise<void>;
   /** Puts the scene into bonus mode without animation (after a reload). */

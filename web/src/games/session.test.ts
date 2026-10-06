@@ -100,7 +100,7 @@ function setup(script: Record<string, Response[]>, balance = 10_000) {
     options: () => ({ turbo: true }),
     delay: async () => {},
   });
-  return { store, calls, requests, balance: () => bal };
+  return { store, calls, requests, renderer: r, balance: () => bal };
 }
 
 const SPIN = "POST /games/halls-of-valhalla/spin";
@@ -212,6 +212,32 @@ describe("slot session", () => {
     await store.getState().playBonus();
     expect(requests.filter((r) => r.path === ACTION)).toHaveLength(2);
     expect(store.getState().phase).toBe("idle");
+  });
+
+  it("asks the renderer for each pick in a pick bonus and never spins the reels", async () => {
+    const pick = (step: number, status: "active" | "completed" = "active"): BonusState =>
+      bonusState({ kind: "pick", step, status, actions: status === "active" ? [{ action: "pick", choices: ["0", "1", "2"] }] : [], data: {} });
+    const { store, calls, requests, renderer } = setup({
+      [BONUS]: [json(200, pick(0))],
+      [ACTION]: [json(200, stepResult(pick(1), 300, 10_300)), json(200, stepResult(pick(2, "completed"), 0, 10_300))],
+    });
+    const asked: { step: number; auto: boolean }[] = [];
+    let n = 0;
+    renderer.chooseBonusAction = async (b, o) => {
+      asked.push({ step: b.step, auto: o.auto });
+      return { action: "pick", choice: String(2 - n++) };
+    };
+    await store.getState().resume();
+    await vi.waitFor(() => expect(store.getState().phase).toBe("idle"));
+    expect(requests.filter((r) => r.path === ACTION).map((r) => r.body)).toEqual([
+      { action: "pick", choice: "2", step: 0 },
+      { action: "pick", choice: "1", step: 1 },
+    ]);
+    expect(asked).toEqual([
+      { step: 0, auto: false },
+      { step: 1, auto: false },
+    ]);
+    expect(calls).not.toContain("startSpin");
   });
 
   it("autoplays the requested number of spins", async () => {

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a12"/><stop offset="1" stop-color="#140c03"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#e3b23c"/><stop offset="1" stop-color="#5a3d0c"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#ffe08a" stop-opacity=".35"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f6fa"/><stop offset=".5" stop-color="#9aa8b8"/><stop offset="1" stop-color="#4b5666"/></linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="34" fill="url(#rim)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#glow)"/>
+  
+  <ellipse cx="128" cy="176" rx="70" ry="22" fill="#b07a1c"/>
+  <circle cx="98" cy="150" r="24" fill="url(#gold)" stroke="#7a4c08" stroke-width="3"/>
+  <circle cx="150" cy="146" r="26" fill="url(#gold)" stroke="#7a4c08" stroke-width="3"/>
+  <circle cx="124" cy="118" r="26" fill="url(#gold)" stroke="#7a4c08" stroke-width="3"/>
+  <path d="M124 104 V132 M150 132 V160" stroke="#7a4c08" stroke-width="4"/>
+  <path d="M92 70 L100 84 M164 70 L156 84 M128 56 V72" stroke="#fff3c4" stroke-width="5" stroke-linecap="round"/>
+  
+</svg>
+<!-- treasure -->

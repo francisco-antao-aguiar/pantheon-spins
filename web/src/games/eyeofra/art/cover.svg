@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a2a"/><stop offset=".55" stop-color="#5a2410"/><stop offset="1" stop-color="#c8641a"/></linearGradient>
+    <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#ffb347"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".55" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+  </defs>
+  <rect width="500" height="300" fill="url(#sky)"/>
+  <circle cx="250" cy="170" r="120" fill="url(#sun)"/>
+  <path d="M60 300 L190 120 L320 300 Z" fill="#7a4a1c"/><path d="M190 120 L320 300 H250 Z" fill="#5a3412"/>
+  <path d="M260 300 L380 150 L500 300 Z" fill="#8a5622"/><path d="M380 150 L500 300 H440 Z" fill="#663e16"/>
+  <path d="M0 300 L70 210 L150 300 Z" fill="#6a3e16"/>
+  <path d="M200 180 Q250 150 300 180 Q250 206 200 180 Z" fill="#fff3d6" stroke="#2a1600" stroke-width="5"/>
+  <circle cx="250" cy="180" r="13" fill="#2a1600"/>
+  <text x="250" y="70" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="58" fill="url(#gold)" stroke="#2a1600" stroke-width="2.5" letter-spacing="5">EYE OF RA</text>
+</svg>

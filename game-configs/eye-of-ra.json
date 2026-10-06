@@ -1,0 +1,323 @@
+{
+  "$schema": "./schema/game-config.schema.json",
+  "id": "eye-of-ra",
+  "name": "Eye of Ra",
+  "theme": "egyptian",
+  "description": "Clusters of 5 or more pay and tumble away, and every cascade raises the multiplier. Four Eyes of Ra open the Tomb Explorer: three chambers of sealed urns, and a curse that ends the hunt.",
+  "layout": "cluster",
+  "reels": 6,
+  "rows": 5,
+  "volatility": "high",
+  "tags": [
+    "new"
+  ],
+  "betLevels": [
+    20,
+    40,
+    100,
+    200,
+    400,
+    1000,
+    2000,
+    5000
+  ],
+  "defaultBet": 100,
+  "targetRtp": {
+    "min": 0.94,
+    "max": 0.97
+  },
+  "symbols": [
+    {
+      "id": "lotus",
+      "name": "Lotus",
+      "kind": "low",
+      "pays": {
+        "5": 0.45,
+        "6": 0.65,
+        "7": 0.9,
+        "8": 1.35,
+        "9": 1.8,
+        "10": 2.25,
+        "12": 4.5,
+        "15": 9.0
+      }
+    },
+    {
+      "id": "ankh",
+      "name": "Ankh",
+      "kind": "low",
+      "pays": {
+        "5": 0.45,
+        "6": 0.65,
+        "7": 0.9,
+        "8": 1.35,
+        "9": 1.8,
+        "10": 2.25,
+        "12": 4.5,
+        "15": 9.0
+      }
+    },
+    {
+      "id": "djed",
+      "name": "Djed Pillar",
+      "kind": "low",
+      "pays": {
+        "5": 0.45,
+        "6": 0.9,
+        "7": 1.1,
+        "8": 1.8,
+        "9": 2.25,
+        "10": 2.7,
+        "12": 5.6,
+        "15": 11.25
+      }
+    },
+    {
+      "id": "feather",
+      "name": "Feather of Ma'at",
+      "kind": "low",
+      "pays": {
+        "5": 0.65,
+        "6": 0.9,
+        "7": 1.35,
+        "8": 2.0,
+        "9": 2.7,
+        "10": 3.4,
+        "12": 6.75,
+        "15": 13.5
+      }
+    },
+    {
+      "id": "jar",
+      "name": "Canopic Jar",
+      "kind": "high",
+      "pays": {
+        "5": 1.1,
+        "6": 1.8,
+        "7": 2.25,
+        "8": 3.4,
+        "9": 4.5,
+        "10": 5.6,
+        "12": 11.25,
+        "15": 22.5
+      }
+    },
+    {
+      "id": "cat",
+      "name": "Bastet",
+      "kind": "high",
+      "pays": {
+        "5": 1.6,
+        "6": 2.25,
+        "7": 3.15,
+        "8": 4.75,
+        "9": 6.3,
+        "10": 7.9,
+        "12": 15.75,
+        "15": 31.5
+      }
+    },
+    {
+      "id": "falcon",
+      "name": "Horus Falcon",
+      "kind": "high",
+      "pays": {
+        "5": 2.25,
+        "6": 3.4,
+        "7": 4.5,
+        "8": 6.75,
+        "9": 9.0,
+        "10": 11.25,
+        "12": 22.5,
+        "15": 45.0
+      }
+    },
+    {
+      "id": "mask",
+      "name": "Golden Mask",
+      "kind": "high",
+      "pays": {
+        "5": 3.6,
+        "6": 5.4,
+        "7": 7.2,
+        "8": 10.8,
+        "9": 14.4,
+        "10": 18.0,
+        "12": 36.0,
+        "15": 72.0
+      }
+    },
+    {
+      "id": "eye",
+      "name": "Eye of Ra",
+      "kind": "scatter"
+    }
+  ],
+  "reelSets": {
+    "base": [
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      },
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      },
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      },
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      },
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      },
+      {
+        "lotus": 200,
+        "ankh": 200,
+        "djed": 190,
+        "feather": 180,
+        "jar": 40,
+        "cat": 32,
+        "falcon": 24,
+        "mask": 18,
+        "eye": 19
+      }
+    ]
+  },
+  "params": {
+    "scatter": "eye",
+    "triggerCount": 4,
+    "multiplierStep": 1,
+    "maxMultiplier": 10,
+    "maxWinX": 10000,
+    "extraScatterMultiplier": 1,
+    "chambers": [
+      {
+        "urns": 9,
+        "curses": 0,
+        "passage": true,
+        "multiplier": 1,
+        "pharaohX": 0,
+        "treasures": [
+          {
+            "value": 1.9,
+            "weight": 30
+          },
+          {
+            "value": 3.85,
+            "weight": 30
+          },
+          {
+            "value": 5.75,
+            "weight": 20
+          },
+          {
+            "value": 9.6,
+            "weight": 12
+          },
+          {
+            "value": 19.2,
+            "weight": 8
+          }
+        ]
+      },
+      {
+        "urns": 9,
+        "curses": 2,
+        "passage": true,
+        "multiplier": 2,
+        "pharaohX": 0,
+        "treasures": [
+          {
+            "value": 1.9,
+            "weight": 30
+          },
+          {
+            "value": 3.85,
+            "weight": 30
+          },
+          {
+            "value": 5.75,
+            "weight": 20
+          },
+          {
+            "value": 9.6,
+            "weight": 12
+          },
+          {
+            "value": 19.2,
+            "weight": 8
+          }
+        ]
+      },
+      {
+        "urns": 9,
+        "curses": 3,
+        "passage": false,
+        "multiplier": 3,
+        "pharaohX": 96.0,
+        "treasures": [
+          {
+            "value": 1.9,
+            "weight": 30
+          },
+          {
+            "value": 3.85,
+            "weight": 30
+          },
+          {
+            "value": 5.75,
+            "weight": 20
+          },
+          {
+            "value": 9.6,
+            "weight": 12
+          },
+          {
+            "value": 19.2,
+            "weight": 8
+          }
+        ]
+      }
+    ]
+  }
+}

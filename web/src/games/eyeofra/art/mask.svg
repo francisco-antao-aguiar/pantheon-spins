@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16305e"/><stop offset="1" stop-color="#060f24"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#ffe08a"/><stop offset="1" stop-color="#5a3d0c"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#ffe08a" stop-opacity=".35"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f6fa"/><stop offset=".5" stop-color="#9aa8b8"/><stop offset="1" stop-color="#4b5666"/></linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="34" fill="url(#rim)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#glow)"/>
+  
+  <path d="M60 80 Q60 52 128 48 Q196 52 196 80 L184 196 Q128 214 72 196 Z" fill="#2a5aa8"/>
+  <path d="M68 80 L80 196 M188 80 L176 196 M96 60 L100 200 M160 60 L156 200" stroke="url(#gold)" stroke-width="9"/>
+  <path d="M92 70 Q128 58 164 70 L160 170 Q128 186 96 170 Z" fill="url(#gold)" stroke="#5a3d0c" stroke-width="3"/>
+  <path d="M106 112 Q114 104 122 112 M134 112 Q142 104 150 112" stroke="#14213d" stroke-width="6" fill="none"/>
+  <path d="M120 150 Q128 156 136 150" stroke="#8a5a12" stroke-width="4" fill="none"/>
+  <rect x="120" y="170" width="16" height="30" rx="4" fill="url(#gold)"/>
+  
+</svg>
+<!-- mask -->

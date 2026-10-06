@@ -102,6 +102,21 @@ describe("session store", () => {
     expect(store.getState()).toMatchObject({ status: "signedOut", me: null });
   });
 
+  it("ignores a /me response that was in flight when the user signed out", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const slowMe: Route = (req) =>
+      req.method === "GET" && new URL(req.url).pathname === "/api/v1/me"
+        ? (gate.then(() => json(200, me)) as unknown as Response)
+        : undefined;
+    const { store } = setup(slowMe, route("POST", "/auth/logout", () => new Response(null, { status: 204 })));
+    const loading = store.getState().load();
+    await store.getState().logout();
+    release();
+    await loading;
+    expect(store.getState()).toMatchObject({ status: "signedOut", me: null });
+  });
+
   it("updates the balance only when signed in", async () => {
     const { store } = setup(route("GET", "/me", () => json(200, me)));
     store.getState().setBalance(5);

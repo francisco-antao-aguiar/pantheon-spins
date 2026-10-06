@@ -17,17 +17,21 @@ export interface SessionState {
 }
 
 export function createSessionStore(client: ApiClient) {
+  // Bumped by every sign-in and sign-out, so a /me response that was already
+  // in flight cannot undo them (e.g. StrictMode's double load in development).
+  let epoch = 0;
   return create<SessionState>()((set) => ({
     status: "loading",
     me: null,
 
     async load() {
+      const started = epoch;
       try {
         const me = unwrap(await client.GET("/me"));
-        set({ status: "signedIn", me });
+        if (started === epoch) set({ status: "signedIn", me });
       } catch (err) {
         if (err instanceof ApiError && err.status === 401) {
-          set({ status: "signedOut", me: null });
+          if (started === epoch) set({ status: "signedOut", me: null });
           return;
         }
         throw err;
@@ -36,15 +40,18 @@ export function createSessionStore(client: ApiClient) {
 
     async login(email, password) {
       const me = unwrap(await client.POST("/auth/login", { body: { email, password } }));
+      epoch++;
       set({ status: "signedIn", me });
     },
 
     async register(email, password, username) {
       const me = unwrap(await client.POST("/auth/register", { body: { email, password, username } }));
+      epoch++;
       set({ status: "signedIn", me });
     },
 
     async logout() {
+      epoch++;
       try {
         unwrap(await client.POST("/auth/logout"));
       } finally {
