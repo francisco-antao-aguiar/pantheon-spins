@@ -11,7 +11,7 @@
     "test": "vitest run",
     "gen:api": "openapi-typescript ../server/api/openapi.yaml -o src/api/schema.d.ts",
     "e2e": "playwright test",
-    "gen:art": "node scripts/gen-valhalla-art.mjs",
+    "gen:art": "node scripts/gen-valhalla-art.mjs && node scripts/gen-eyeofra-art.mjs",
     "gen:audio": "node scripts/gen-audio.mjs"
   },
   "dependencies": {

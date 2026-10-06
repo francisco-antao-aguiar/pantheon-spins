@@ -190,6 +190,51 @@ export class ReelGrid extends Container {
     void this.o.tweener.to(reel.strip, { y: 0 }, 260, ease.outBack);
   }
 
+  /** Bursts cells that are being cleared (cascade wins). */
+  async explode(positions: Position[]) {
+    const t = this.o.tweener;
+    await Promise.all(
+      positions.map((p) => {
+        const s = this.sprite(p);
+        if (!s) return Promise.resolve();
+        if (this.o.reducedMotion) return t.to(s, { alpha: 0 }, 150);
+        const k = s.scale.x;
+        return t.run(260, (q) => {
+          s.scale.set(k * (1 + 0.35 * Math.sin(q * Math.PI * 0.5)) * (1 - q));
+          s.alpha = 1 - q;
+        });
+      }),
+    );
+  }
+
+  /**
+   * Drops the board into `next` after `removed` cells were cleared: in each
+   * reel the survivors fall to their new rows and new symbols fall in from
+   * above, matching how the server tumbled the grid.
+   */
+  async cascadeTo(next: string[][], removed: Position[]) {
+    const { cell, tweener: t } = this.o;
+    const moves: Promise<void>[] = [];
+    this.reels.forEach((reel, r) => {
+      const gone = new Set(removed.filter((p) => p.reel === r).map((p) => p.row));
+      if (gone.size === 0) return;
+      const rows = reel.sprites.length - 1;
+      const survivors = [...Array(rows).keys()].filter((row) => !gone.has(row));
+      const k = gone.size;
+      for (let row = 0; row < rows; row++) {
+        const s = reel.sprites[row + 1]!;
+        this.place(s, next[r]?.[row] ?? "");
+        const from = row >= k ? survivors[row - k]! : row - k; // new symbols start above the reel
+        const to = row * cell + cell / 2;
+        s.y = from * cell + cell / 2;
+        const ms = this.o.reducedMotion ? 120 : 180 + 45 * (row - from);
+        moves.push(t.to(s, { y: to }, ms, this.o.reducedMotion ? ease.linear : ease.outBack));
+      }
+    });
+    await Promise.all(moves);
+    this.grid = next.map((col) => [...col]);
+  }
+
   sprite(p: Position): Sprite | undefined {
     return this.reels[p.reel]?.sprites[p.row + 1];
   }

@@ -11,6 +11,9 @@ export default defineConfig({
   timeout: 180_000,
   expect: { timeout: 20_000 },
   fullyParallel: false,
+  // One at a time: each test renders WebGL in software, and two at once
+  // starve each other (and the dev stack) on a laptop.
+  workers: 1,
   retries: 0,
   reporter: [["list"]],
   use: {

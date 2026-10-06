@@ -40,7 +40,7 @@ test("register, log in, spin, and resume a bonus after a reload", async ({ page 
   // Open the game from the lobby.
   await page.getByRole("link", { name: /Halls of Valhalla/ }).click();
   await expect(page).toHaveURL(new RegExp(`/play/${GAME}$`));
-  await expect(page.locator("canvas")).toBeVisible();
+  await expect(page.locator("canvas")).toBeVisible({ timeout: 45_000 });
   const spin = page.getByRole("button", { name: "Spin", exact: true });
   await expect(spin).toBeEnabled();
   await page.getByRole("button", { name: "TURBO" }).click();

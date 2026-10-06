@@ -49,6 +49,7 @@ With Go installed locally, the same commands work from `server/` directly.
 | Game | Layout | Bonus | RTP (10M spins) | Hit freq. |
 | ---- | ------ | ----- | --------------- | --------- |
 | Halls of Valhalla | 5×4, 1024 ways | Ragnarök Free Spins: the god with the most of the 3+ bonus symbols leads (Odin: raven wilds, Thor: lightning multipliers, Loki: transforms) | 95.10% ± 0.42% | 39.8% |
+| Eye of Ra | 6×5 cluster pays, cascades (multiplier ×1 → ×10 per cascade) | Tomb Explorer: pick urns across 3 chambers; find the passage, avoid the curse, Pharaoh's treasure in the last chamber | 95.17% ± 0.55% | 37.3% |
 
 Each game is a Go package under `server/internal/games/<game>` with a config in
 `game-configs/`, and a PixiJS renderer under `web/src/games/<game>` implementing
@@ -74,7 +75,7 @@ Placeholder SVG art and synthesized audio come from scripts, so final assets can
 replace the files without code changes:
 
 ```bash
-cd web && npm run gen:art && npm run gen:audio
+cd web && npm run gen:art && npm run gen:audio   # art kit: scripts/art-kit.mjs
 ```
 
 ## End-to-end tests

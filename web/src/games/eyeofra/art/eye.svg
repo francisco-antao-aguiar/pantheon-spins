@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b2a06"/><stop offset="1" stop-color="#1c0700"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#ffe08a"/><stop offset="1" stop-color="#5a3d0c"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#ffb347" stop-opacity=".35"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e3a937"/><stop offset="1" stop-color="#8a5a12"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f6fa"/><stop offset=".5" stop-color="#9aa8b8"/><stop offset="1" stop-color="#4b5666"/></linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="34" fill="url(#rim)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="28" fill="url(#glow)"/>
+  
+  <circle cx="128" cy="78" r="30" fill="#ff8c1a" stroke="url(#gold)" stroke-width="6"/>
+  <path d="M60 136 Q128 92 196 136 Q128 176 60 136 Z" fill="#fff3d6" stroke="#2a1600" stroke-width="7"/>
+  <circle cx="128" cy="136" r="20" fill="#2a1600"/>
+  <circle cx="122" cy="130" r="6" fill="#ffe08a"/>
+  <path d="M112 156 Q106 180 92 190 M140 156 L168 192" stroke="#2a1600" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <text x="128" y="226" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="26" fill="#fff6dc" stroke="#2a1600" stroke-width="5" paint-order="stroke" letter-spacing="2">RA</text>
+</svg>
+<!-- eye -->

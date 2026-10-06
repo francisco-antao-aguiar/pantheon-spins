@@ -1,7 +1,7 @@
 import { createStore } from "zustand/vanilla";
 import { ApiError, unwrap, type ApiClient, type BonusState, type GameInfo } from "../api/client";
 import { affordableBet, autoplayStopReason, STOP_MESSAGES, stepBet, type AutoplayRun, type AutoplaySettings } from "../stores/play";
-import type { GameRenderer, PlayOptions, WinTier } from "./types";
+import { SPIN_BONUSES, type BonusAction, type GameRenderer, type PlayOptions, type WinTier } from "./types";
 
 export type Phase =
   | "idle" // ready to spin
@@ -144,14 +144,18 @@ export function createSlotSession(info: GameInfo, initialBet: number, deps: Slot
         const opts = deps.options();
         while (get().bonus?.status === "active" && !get().bonusPaused) {
           const bonus = get().bonus!;
-          deps.renderer.startSpin(opts);
+          const spins = SPIN_BONUSES.includes(bonus.kind);
+          const action: BonusAction = deps.renderer.chooseBonusAction
+            ? await deps.renderer.chooseBonusAction(bonus, { auto: !!get().autoplay })
+            : { action: bonus.actions[0]?.action ?? "spin" };
+          if (spins) deps.renderer.startSpin(opts);
           let res;
           try {
             res = unwrap(
-              await deps.api.POST("/games/{gameId}/bonus/actions", { ...path, body: { action: "spin", step: bonus.step } }),
+              await deps.api.POST("/games/{gameId}/bonus/actions", { ...path, body: { ...action, step: bonus.step } }),
             );
           } catch (err) {
-            await deps.renderer.cancelSpin();
+            if (spins) await deps.renderer.cancelSpin();
             if (err instanceof ApiError && (err.code === "stale_step" || err.code === "no_active_bonus")) {
               // Another tab (or a retry) moved the bonus on: reload it and carry on.
               const fresh = await deps.api.GET("/games/{gameId}/bonus", path);
@@ -166,15 +170,15 @@ export function createSlotSession(info: GameInfo, initialBet: number, deps: Slot
             return;
           }
           await deps.renderer.playBonusStep(res, opts);
-          if (CELEBRATED.includes(res.winTier)) await deps.renderer.celebrate(res.stepWin, res.state.bet, res.winTier, opts);
           deps.setBalance(res.balance);
           set({ bonus: res.state, lastWin: res.state.totalWin });
+          if (CELEBRATED.includes(res.winTier)) await deps.renderer.celebrate(res.stepWin, res.state.bet, res.winTier, opts);
           if (res.state.status === "completed") {
             await deps.renderer.playBonusEnd(res.state, opts);
             set({ bonus: null, phase: "idle" });
             return;
           }
-          await delay(opts.turbo ? 200 : 600);
+          if (spins) await delay(opts.turbo ? 200 : 600);
         }
         if (get().bonus) set({ phase: "bonus" });
       },

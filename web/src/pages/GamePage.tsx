@@ -7,7 +7,7 @@ import { SoundManager } from "../audio/sound";
 import { Coins } from "../components/ui";
 import { clientGames } from "../games/registry";
 import { createSlotSession, type SlotSession } from "../games/session";
-import type { GameModule, GameRenderer } from "../games/types";
+import { SPIN_BONUSES, type GameModule, type GameRenderer } from "../games/types";
 import { affordableBet, DEFAULT_AUTOPLAY, usePlayPrefs, type AutoplaySettings } from "../stores/play";
 import { useSession } from "../stores/session";
 
@@ -119,8 +119,9 @@ export function GamePage() {
           ref={hostRef}
           className="absolute inset-0 touch-manipulation"
           onClick={() => {
-            const phase = loaded?.session.getState().phase;
-            if (phase === "spinning" || phase === "bonusPlaying") loaded?.renderer.skip();
+            // Taps skip animations, except in pick bonuses where taps are the game.
+            const { phase, bonus } = loaded?.session.getState() ?? {};
+            if (phase === "spinning" || (phase === "bonusPlaying" && bonus && SPIN_BONUSES.includes(bonus.kind))) loaded?.renderer.skip();
           }}
           aria-label="Game screen. Tap to skip animations."
         />
@@ -181,7 +182,12 @@ function BonusPanel({ session, module }: { session: SlotSession; module: GameMod
         <div className="min-w-0 text-sm">
           <p className="font-semibold text-gold-300">{module.describeBonus(bonus)}</p>
           <p className="text-xs text-slate-400">
-            {d.spinsLeft ?? 0} of {d.totalSpins ?? 0} spins left · won <Coins value={bonus.totalWin} className="text-slate-200" />
+            {d.totalSpins !== undefined && (
+              <>
+                {d.spinsLeft ?? 0} of {d.totalSpins} spins left ·{" "}
+              </>
+            )}
+            won <Coins value={bonus.totalWin} className="text-slate-200" />
           </p>
         </div>
         {phase === "bonus" && (
@@ -192,7 +198,7 @@ function BonusPanel({ session, module }: { session: SlotSession; module: GameMod
             Continue
           </button>
         )}
-        {phase === "bonusPlaying" && (
+        {phase === "bonusPlaying" && SPIN_BONUSES.includes(bonus.kind) && (
           <button onClick={() => session.getState().pauseBonus()} className="rounded-xl border border-night-600 px-3 py-2 text-sm" disabled={paused}>
             {paused ? "Pausing…" : "Pause"}
           </button>

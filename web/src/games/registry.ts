@@ -20,4 +20,9 @@ export const clientGames: Record<string, ClientGame> = {
     cover: covers["./valhalla/art/cover.svg"]!,
     accent: "#e3a937",
   },
+  "eye-of-ra": {
+    load: () => import("./eyeofra").then((m) => m.default),
+    cover: covers["./eyeofra/art/cover.svg"]!,
+    accent: "#ff9d3c",
+  },
 };

@@ -140,3 +140,14 @@ write("valhalla/loki", mix(tone(note(64), 0.8, { a: 0.05, d: 0.5, type: "tri", v
 write("valhalla/horn", tone(note(45), 1.8, { a: 0.25, d: 1.2, type: "saw", vol: 0.35 }));
 write("valhalla/music-base", musicLoop({ root: 57, scale: [0, 2, 3, 5, 7, 8, 10], bpm: 84, bars: 4, drums: false }), 0.5);
 write("valhalla/music-free", musicLoop({ root: 57, scale: [0, 2, 3, 5, 7, 8, 10], bpm: 126, bars: 4, drums: true, arpType: "saw", arpVol: 0.14 }), 0.55);
+
+// Eye of Ra (Phrygian dominant scale for an Egyptian colour).
+mkdirSync(join(OUT, "eyeofra"), { recursive: true });
+const hijaz = [0, 1, 4, 5, 7, 8, 10];
+write("eyeofra/crumble", mix(noiseBurst(0.5, { a: 0.005, d: 0.18, vol: 0.6, lowpass: 0.12 }), tone(70, 0.4, { d: 0.15, vol: 0.4, slide: -0.6 })));
+write("eyeofra/urn-open", mix(noiseBurst(0.25, { a: 0.002, d: 0.05, vol: 0.6, lowpass: 0.7 }), tone(note(76), 0.4, { d: 0.2, type: "tri", vol: 0.25 })));
+write("eyeofra/treasure", seq([74, 78, 81, 86], 0.06, { d: 0.18, type: "tri", vol: 0.35 }));
+write("eyeofra/passage", mix(noiseBurst(1.2, { a: 0.2, d: 0.6, vol: 0.5, lowpass: 0.04 }), tone(45, 1.2, { a: 0.2, d: 0.6, vol: 0.4 })));
+write("eyeofra/curse", mix(noiseBurst(1.0, { a: 0.05, d: 0.5, vol: 0.5, lowpass: 0.5 }), tone(note(50), 1.0, { a: 0.05, d: 0.6, type: "saw", vol: 0.3, slide: -0.8 })));
+write("eyeofra/music-base", musicLoop({ root: 62, scale: hijaz, bpm: 92, bars: 4, drums: false }), 0.5);
+write("eyeofra/music-bonus", musicLoop({ root: 62, scale: hijaz, bpm: 70, bars: 4, drums: true, arpType: "tri", arpVol: 0.16 }), 0.5);
